@@ -1,0 +1,13 @@
+#Venv
+Venv/
+.venv/
+venv/
+
+#Pycache
+*.pyc
+
+#All CSVs
+*.csv
+
+# OS
+.DS_Store
