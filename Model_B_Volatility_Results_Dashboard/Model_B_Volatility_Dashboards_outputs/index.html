@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model B Volatility Dashboards</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07131d;
+      --bg-2: #0b1823;
+      --panel: #10202d;
+      --panel-2: #142736;
+      --line: #22394b;
+      --line-soft: rgba(255,255,255,0.05);
+      --ink: #e8f1fa;
+      --muted: #96aabd;
+      --model-b: #6cb6ff;
+      --model-b-rt: #ff8f70;
+      --model-k: #4fd1c5;
+      --pill: #122736;
+    }
+    html {
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(108, 182, 255, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(255, 143, 112, 0.15), transparent 28%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 34px 24px 54px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--ink);
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    a {
+      color: #9aceff;
+    }
+    .hero {
+      padding: 24px 24px 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        var(--panel);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 16px 40px rgba(0,0,0,0.18);
+    }
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a9c7e2;
+    }
+    .lead {
+      max-width: 920px;
+      margin: 14px 0 0;
+      font-size: 15px;
+    }
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--pill);
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .swatch.total {
+      background: var(--model-b);
+    }
+    .swatch.vol {
+      background: var(--model-b-rt);
+    }
+    .swatch.k {
+      background: var(--model-k);
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+        var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      padding: 20px 20px 18px;
+    }
+    .note-card {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .note-card p {
+      margin: 0;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.01);
+    }
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 10px 11px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+      position: sticky;
+      top: 0;
+    }
+    .data-table td {
+      color: var(--ink);
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .chart-wrap {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .chart-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .links {
+      display: grid;
+      gap: 8px;
+      padding-left: 18px;
+    }
+    code {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Model B Dashboard Index</p>
+    <h1>Model B Volatility Dashboard Families</h1>
+    <p class="lead">
+      This output contains two dark-mode dashboard families built on the same real-time volatility
+      segmentation: <code>Model B RT vs Model B Total</code> and <code>Model B RT vs Model K RT</code>.
+    </p>
+    <div class="hero-pills">
+      <span class='pill'><span class='swatch total'></span>Model B Total</span>
+      <span class='pill'><span class='swatch vol'></span>Model B RT</span>
+      <span class='pill'><span class='swatch k'></span>Model K RT</span>
+    </div>
+  </section>
+
+  <h2>Available Dashboard Families</h2>
+  <section class="panel">
+    <ul class="links">
+      <li><a href="model_b_rt_vs_total/index.html">Model B RT vs Model B Total</a></li>
+      <li><a href="model_b_rt_vs_model_k_rt/index.html">Model B RT vs Model K RT</a></li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
