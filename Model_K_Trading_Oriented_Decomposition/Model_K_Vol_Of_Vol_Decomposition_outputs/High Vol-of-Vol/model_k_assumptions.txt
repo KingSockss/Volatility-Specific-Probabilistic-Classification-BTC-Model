@@ -1,0 +1,13 @@
+Kalshi prices are YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.
+Scored event outcome is the official Kalshi contract result: 1 for YES resolved, 0 for NO resolved.
+Forecast rows are joined to outcomes by exact Kalshi market ticker when available; legacy price files without market tickers fall back to event_ticker + contract_label + strike.
+Event tickers are interpreted as the contract settlement/end hour, matching the price fetcher's hour_end_utc -> New York event ticker convention.
+Binance prices are diagnostic only. They may be used for strike matching upstream and audit mismatch checks, but never as the scored truth label.
+Events present in the Kalshi price files but absent from the settlement CSV are excluded from scoring and counted in outcome_join_coverage.csv.
+Vol-of-vol decomposition uses Binance BTCUSDT 1-minute candles aligned to each scored Kalshi forecast minute.
+Minute volatility is defined as abs(log(close/open)) for each one-minute Binance bar.
+Lagged vol-of-vol for forecast minute t is the population standard deviation of minute volatility over the prior 4320 minutes ending at t-1, then assigned to minute t.
+Real-time classification uses a trailing 72-hour (4320-minute) rolling distribution of lagged vol-of-vol values available at each scored minute.
+Rolling cutoff summaries in this run: q10 latest=0.00039205, median=0.00042432, range=[0.00025509, 0.00066640]; q25 latest=0.00040722, median=0.00044365, range=[0.00028395, 0.00067056]; q75 latest=0.00042417, median=0.00048320, range=[0.00034897, 0.00069743]; q90 latest=0.00042552, median=0.00049382, range=[0.00035663, 0.00070288].
+Low Vol-of-Vol includes minutes with lagged vol-of-vol <= trailing q25; Standard Vol-of-Vol includes trailing q25 < lagged vol-of-vol < trailing q75; High Vol-of-Vol includes lagged vol-of-vol >= trailing q75.
+High Vol-of-Vol Extreme is implemented as lagged vol-of-vol >= trailing q90.

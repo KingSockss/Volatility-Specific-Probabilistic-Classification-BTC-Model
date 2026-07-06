@@ -1,0 +1,2006 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model M RT vs Model K RT: High Volatility Extreme</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07131d;
+      --bg-2: #0b1823;
+      --panel: #10202d;
+      --panel-2: #142736;
+      --line: #22394b;
+      --line-soft: rgba(255,255,255,0.05);
+      --ink: #e8f1fa;
+      --muted: #96aabd;
+      --model-g: #6cb6ff;
+      --model-g-rt: #ff8f70;
+      --model-k: #4fd1c5;
+      --pill: #122736;
+    }
+    html {
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(108, 182, 255, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(255, 143, 112, 0.15), transparent 28%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 34px 24px 54px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--ink);
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    a {
+      color: #9aceff;
+    }
+    .hero {
+      padding: 24px 24px 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        var(--panel);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 16px 40px rgba(0,0,0,0.18);
+    }
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a9c7e2;
+    }
+    .lead {
+      max-width: 920px;
+      margin: 14px 0 0;
+      font-size: 15px;
+    }
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--pill);
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .swatch.total {
+      background: var(--model-g);
+    }
+    .swatch.vol {
+      background: var(--model-g-rt);
+    }
+    .swatch.k {
+      background: var(--model-k);
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+        var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      padding: 20px 20px 18px;
+    }
+    .note-card {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .note-card p {
+      margin: 0;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.01);
+    }
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 10px 11px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+      position: sticky;
+      top: 0;
+    }
+    .data-table td {
+      color: var(--ink);
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .chart-wrap {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .chart-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .links {
+      display: grid;
+      gap: 8px;
+      padding-left: 18px;
+    }
+    code {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Cross-Model Volatility Dashboard</p>
+    <h1>Model M RT vs Model K RT: High Volatility Extreme</h1>
+    <p class="lead">This page compares <code>Model_M_Volatility_Decomposition_RT.py</code> against <code>Model_K_Volatility_Decomposition_RT.py</code> on the exact overlapping scored-row universe inside <code>High Volatility Extreme</code>. The volatility slice is defined as: Hourly realized volatility at or above the trailing 72-hour rolling 90th percentile.</p>
+    <div class="hero-pills"><span class='pill'><span class='swatch vol'></span>High Volatility Extreme hourly markets: 29</span><span class='pill'>Overlap scored rows: 219</span><span class='pill'>Overlap event contracts: 87</span><span class='pill'>Overlap match rate: 1.0000 vs 1.0000</span></div>
+  </section>
+
+  <h2>Topline Comparison</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>metric</th>
+      <th>focus</th>
+      <th>benchmark</th>
+      <th>delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Scored rows</td>
+      <td>219</td>
+      <td>219</td>
+      <td>+0</td>
+    </tr>
+    <tr>
+      <td>Event contracts</td>
+      <td>87</td>
+      <td>87</td>
+      <td>+0</td>
+    </tr>
+    <tr>
+      <td>Brier score</td>
+      <td>0.1838</td>
+      <td>0.1685</td>
+      <td>+0.0153</td>
+    </tr>
+    <tr>
+      <td>Log loss</td>
+      <td>0.5298</td>
+      <td>0.5140</td>
+      <td>+0.0157</td>
+    </tr>
+    <tr>
+      <td>ECE</td>
+      <td>0.1420</td>
+      <td>0.1161</td>
+      <td>+0.0259</td>
+    </tr>
+  </tbody>
+</table></div>
+    <p class="chart-note">All comparison metrics on this page are computed on the exact overlapping scored-row universe, so the Model M and Model K values are directly comparable inside the same volatility slice.</p>
+  </section>
+
+  <h2>Chart Comparison</h2>
+  <section class="section-stack">
+    <div class="chart-wrap"><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="b98ef91d-b416-4acb-b697-e527b97aeaa6" class="plotly-graph-div" style="height:430px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("b98ef91d-b416-4acb-b697-e527b97aeaa6")) {                    Plotly.newPlot(                        "b98ef91d-b416-4acb-b697-e527b97aeaa6",                        [{"line":{"color":"#8ea3b7","dash":"dash"},"mode":"lines","name":"Perfect calibration","x":[0,1],"y":[0,1],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#4fd1c5","width":3},"marker":{"color":"#4fd1c5","size":8},"mode":"lines+markers","name":"Model K RT: High Volatility Extreme","x":{"dtype":"f8","bdata":"QChW3FAvoj+5U+2GILrDPwbEptKQc88\u002f9w6JKkK81T+V\u002fGLJL5bcP8ErC7yywOE\u002f16NwPQrX5D9knEjGiWToPwrXo3A9Cus\u002f38lqeWME7z8="},"y":{"dtype":"f8","bdata":"AAAAAAAAAAAeHh4eHh6uPxiGYRiGYcg\u002fsRM7sRM74T9VVVVVVVXlP1100UUXXeQ\u002fq6qqqqqq6j\u002fRRRdddNHlP8dxHMdxHOc\u002fO6iDOqiD6j8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#ff8f70","width":3},"marker":{"color":"#ff8f70","size":8},"mode":"lines+markers","name":"Model M RT: High Volatility Extreme","x":{"dtype":"f8","bdata":"WZhI4JQSkj\u002fO+JiaU3fDP3MOEl6sNM4\u002fK5+Cqm\u002fG1j\u002fVwzu4nLHdP87FlZjtfOE\u002fcmJhPLr34z8\u002fScY\u002fdYznPyRjnK8TF+s\u002fwUV2T1EA7z8="},"y":{"dtype":"f8","bdata":"AAAAAAAAAABkIQtZyEKmPyivobyG8so\u002fO7ETO7ET2z92Yid2YifmPwAAAAAAAPA\u002fERERERER4T8AAAAAAADkP1100UUXXeQ\u002f05ve9KY37T8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"marker":{"color":"#4fd1c5"},"name":"Model K RT: High Volatility Extreme","opacity":0.6,"x":{"dtype":"f8","bdata":"mpmZmZmZmT+amZmZmZmZPwrXo3A9Cqc\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fKVyPwvUozD97FK5H4XrEP4XrUbgehdM\u002fPQrXo3A9yj\u002fsUbgehevBPz0K16NwPdI\u002fPQrXo3A9yj+PwvUoXI\u002fCP4\u002fC9Shcj9I\u002fj8L1KFyPwj9SuB6F61G4P83MzMzMzMw\u002fUrgehetRuD+kcD0K16OwP9ejcD0K18M\u002fSOF6FK5HwT+79Shcj8K1P\u002fYoXI\u002fC9cg\u002f9ihcj8L1yD+kcD0K16PAP+xRuB6F69E\u002f16NwPQrX0z+F61G4HoXLPzMzMzMzM9s\u002f16NwPQrX7z+F61G4HoXvP9ejcD0K1+8\u002fH4XrUbge4T+F61G4HoXbPwAAAAAAAOQ\u002fuB6F61G4nj97FK5H4XqEPylcj8L1KKw\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002f7FG4HoXr2T9I4XoUrkfRPx+F61G4HuE\u002fPQrXo3A95j8UrkfhehTiP8L1KFyPwuk\u002fcT0K16Nw5T8+CtejcD3iP3sUrkfheug\u002f4XoUrkfh7j\u002fD9Shcj8LtPzMzMzMzM+8\u002fH4XrUbge4T\u002fhehSuR+HSP\u002fYoXI\u002fC9eg\u002fcT0K16Nw4T+amZmZmZnRPx+F61G4Huk\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fCtejcD0Kpz\u002fsUbgeheuhP+xRuB6F67E\u002fAAAAAAAA5D8K16NwPQrfP4XrUbgehec\u002fhetRuB6F0z9SuB6F61HIP7gehetRuN4\u002fmpmZmZmZ2T\u002fhehSuR+HKPylcj8L1KOQ\u002frkfhehSu6z97FK5H4XroPz0K16NwPe4\u002f16NwPQrX7z\u002fXo3A9CtfvP65H4XoUru8\u002fZmZmZmZm7j+amZmZmZntPzMzMzMzM+8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002fSOF6FK5H6T+amZmZmZnlPwAAAAAAAOw\u002f9ihcj8L16D9I4XoUrkflP9ejcD0K1+s\u002fXI\u002fC9Shc6z9SuB6F61HoP0jhehSuR+0\u002fCtejcD0K6z8pXI\u002fC9SjoP0jhehSuR+0\u002fj8L1KFyP2j9SuB6F61HQPwrXo3A9CuM\u002fH4XrUbge3T9SuB6F61HYP6RwPQrXo+A\u002fbz0K16Nw3T8UrkfhehTWP+F6FK5H4eI\u002fw\u002fUoXI\u002fC4T8zMzMzMzPbP+xRuB6F6+U\u002fSOF6FK5H5T9I4XoUrkfhP3E9CtejcOk\u002fhetRuB6F5z\u002fhehSuR+HiP7gehetRuOo\u002fAAAAAAAA6D9cj8L1KFzjPwrXo3A9Cus\u002fexSuR+F66D+F61G4HoXjP65H4XoUrus\u002f7FG4HoXr5T\u002fNzMzMzMzgPxSuR+F6FOo\u002fcT0K16Nw6T9I4XoUrkflP1K4HoXrUew\u002fZmZmZmZm3j+PwvUoXI\u002faPx+F61G4HuE\u002fFK5H4XoU6j\u002f2KFyPwvXoPzMzMzMzM+s\u002fSOF6FK5H4T8UrkfhehTeP+F6FK5H4eI\u002fAAAAAAAA0D+\u002f9Shcj8LFP83MzMzMzNQ\u002fSOF6FK5HwT9SuB6F61G4P\u002fYoXI\u002fC9cg\u002f16NwPQrXwz9SuB6F61G4P4XrUbgehcs\u002fAAAAAAAA6D+4HoXrUbjiP7gehetRuOo\u002fzczMzMzM4D\u002fsUbgehevZP6RwPQrXo+Q\u002fu\u002fUoXI\u002fCtT+4HoXrUbiOP1yPwvUoXM8\u002fw\u002fUoXI\u002fC4T9I4XoUrkfZPz0K16NwPeY\u002f4XoUrkfh5j+uR+F6FK7jP8P1KFyPwuk\u002fPQrXo3A97j+amZmZmZntP+F6FK5H4e4\u002fXI\u002fC9Shc7z+4HoXrUbjuP1yPwvUoXO8\u002fKVyPwvUo3D97FK5H4XrUPz4K16NwPeI\u002fZmZmZmZm1j9cj8L1KFzPPxSuR+F6FN4\u002fhetRuB6F6z97FK5H4XroP3E9CtejcO0\u002fPQrXo3A9yj9pPQrXo3C9Pz0K16NwPdI\u002f7FG4HoXr2T9cj8L1KFzPP1yPwvUoXOM\u002fCtejcD0K3z\u002fNzMzMzMzUPz0K16NwPeY\u002fZmZmZmZm4j9xPQrXo3DVPwAAAAAAAOg\u002fhetRuB6F7z+F61G4HoXvPzMzMzMzM+8\u002fXI\u002fC9Shc7z8zMzMzMzPvP1yPwvUoXO8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002frkfhehSu3z97FK5H4XrUP5qZmZmZmeU\u002frkfhehSu4z\u002f2KFyPwvXgPz0K16NwPeY\u002f4XoUrkfh5j9cj8L1KFzjPx+F61G4Huk\u002fKVyPwvUo6D+amZmZmZnlP2ZmZmZmZuo\u002fhetRuB6F6z+F61G4HoXjP2ZmZmZmZu4\u002f16NwPQrXwz\u002fhehSuR+G6P7gehetRuM4\u002f"},"xbins":{"end":1.0,"size":0.05,"start":0.0},"type":"histogram","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"#ff8f70"},"name":"Model M RT: High Volatility Extreme","opacity":0.6,"x":{"dtype":"f8","bdata":"AAAAAAAAwD8A4la0n0WyP9qhyj1FUcE\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYU0\u002f0C2Z2T8B2B\u002feQlnWPyuA+ElJZ98\u002fMMOSCwJQyT\u002fvgHbyyffDPwkpw+Agd88\u002fFqkPidpKyj8J0DDXvtDGP0gSjeKIddY\u002f1JbsSElayT+nHMoMCvHDP2h+2TilHtY\u002fsq32rBrixz9+1TQJGFvAP84vXbG+yM0\u002fcRenxDNzwT\u002fVUQESo+S6P0c9jtuzt8g\u002fCdAw177Qxj\u002frDNw9mE3AP4AVMmJTWcw\u002f2f8miCbOyT+MJBjxZ3vEP9RDcGz8UNY\u002fMggjJHIo7z9t6BJugXjtPwAAAAAAAPA\u002fb+QP\u002fG\u002f\u002f3z8nFiCKcWveP4XzO+GabeQ\u002fpfEbgw+smD8ZeYPLw42DP170DVkw3aU\u002fAAAAAAAAAAAAAAAAAAAAALgy\u002fox0yYs\u002fb+ZSnnwc1z8D83oGGdrSP7N1+tRfCd4\u002feVFABFck4D+X2oDTj7fYP5mA7Hk3ueI\u002fSkyo\u002f7nW4j9v33y3dDHgP0BgUNTUYuc\u002fesMpUiyT7j\u002fuU3rU3s7sP2q3vx\u002fzzu4\u002fx6I\u002f024G3j8o3RclSY7VPx\u002fU85JQoOM\u002fFoaYEBcI3j8Zge5eip\u002fWP6sh9POmjuM\u002fAAAAAAAAAAAAAAAAAAAAAJprOGLaE1k\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATvMttDGLuj95wJ8z74i0P1XGyX7JZcA\u002fQhYF3rGW4T9u47qKoczfPwoq8ipMGuc\u002fsuVJHb8j0z8qBmrMHiHKPwgDSl726t8\u002fLitslVMS1T94OZyULbvKP4hmMKuUduE\u002fpIJCZ9ol5D\u002fZMafFWIveP+S6X2VH\u002fOY\u002fAAAAAAAA8D8AAAAAAADwPwAAAAAAAPA\u002fwTEQm6GW6j9n6h9r90boP\u002fwVucMMvuw\u002fAAAAAAAA8D8AAAAAAADwPwAAAAAAAPA\u002f\u002f2VptlLI5j9faBBpPobjPz1siHLdgug\u002fc+YSknHI5j++ZgOVCInjP48WhbzByOg\u002fofISJou46T85GOj0s9XmP+5UFYNq7Oo\u002fe4n132oC6T+dCXbmRK3mPw4wUnSWuOo\u002fylLsLdqT3j+iJzaMJ2nTP5vsl0FQEuQ\u002fxmf9rr3F2j9gOjwTLULYP99zUh65lN0\u002fQG5GAnGl2z\u002fuDzJe6wnUP9tExaZHS+E\u002feZCSS8PK2z81ifQT4T7VP\u002fqoj\u002fLIeeE\u002f55Y2qGJ93j9ZEvw+vZvZP\u002f\u002f1NJuYleM\u002fZvtegq6Q4j+lbdCB2gbdP4+Px+To3+Y\u002fPUMZMyum4j+1ifFpW3HcP3W0BKrM4+Y\u002fph1QN9gO5D8ciRJZ9cjdP40CHjo3T+c\u002f4Na3diih4T+HekcYbufbP0Lzo9VbzeY\u002fBbMdR5mJ4T\u002fDpM41BT\u002fbP1m4iG6kpuY\u002fZyV7lCRx3T+BJjVChnDbPznRCu8eQOE\u002fc7GBX5bh6T8eS8A7M9HoP1PT5nGMPOs\u002fX37bFCsM4T+GaklEs93ePzZrkpFnd+I\u002fOhSRJB1pyz9tJyeG0p\u002fKP4JbP08MldA\u002faABwvXRPxj8zYLGi7LG+P576B9X9yso\u002fRg9Q4Vz7yT\u002fRP2B9vqi\u002fP0uefabsDss\u002fb87u5GaG4z8MdlxTDbTfP2Hl5\u002fX7aec\u002fU+B5XXAj3z9cCWLaxgfZP5rvxaUtRuM\u002flKIgmDfZuj9W\u002fWiHPByzPwHhubncjck\u002fBMitrsDB1z8b\u002fReZytrRP3+73WmkoN4\u002fH9r80efj4T9LzR3\u002f6XHgP9+7zEOgAuc\u002fUDD2umIr6z\u002fxZzwQstHoP\u002f+KpOpdYus\u002fd5coIjTN7D+rTfQ9EljrPxY8EPVz1+0\u002fJAawDYED3T\u002fUDq+bxaPYPyOQWNlfrd8\u002ft1CpVkoX1T99I2LqfrbRP+VzvhUItNg\u002fpoi11sKe5z+Ricpq7OfjPymkFTT95Oc\u002fj7HVqeUd2D\u002fYDiR8LdzPPwwx6aqcYN4\u002fgH1uTpct3T+l5WGcvqTWP1SMiL2vp98\u002faD86R\u002fCr2D9YOh39YFvVP1UjG6HxXd4\u002frpfBpW\u002fB3D+GpRtfkz\u002fWP3T4agNDkN8\u002fM3knTh1v7j9jWiizkKvtPxqaM3u0SO8\u002fTF+miRua7j\u002f2T2DErvPtP3qUQ2mHn+8\u002fAAAAAAAA8D8AAAAAAADwPwAAAAAAAPA\u002f0ZCR1VZL3T\u002f0ZAQENFjbPwDSUnA9b+A\u002fh4cO+9An3D+FC\u002fTnlTzZP14WWjSvFeA\u002flXZRVAXk4D+iY74jVmnePxc6YNTk6uM\u002fpFi5P7065T\u002fXR41ZWKPiPwWW1\u002fz0yuY\u002feSqMXbMj6T8Mr4SeUSHlP3z1fFqoR+w\u002fro8MEsWr0D\u002f\u002fq1hpj2zHPxmEaRupyNM\u002f"},"xbins":{"end":1.0,"size":0.05,"start":0.0},"type":"histogram","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.445],"title":{"text":"Mean predicted probability"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Observed frequency"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"xaxis2":{"anchor":"y2","domain":[0.555,1.0],"title":{"text":"Predicted probability"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Count"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Calibration Curve Overlay","x":0.2225,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Probability Distribution Overlay","x":0.7775000000000001,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"}],"font":{"color":"#e8f1fa"},"legend":{"font":{"size":11},"orientation":"h","x":0.0,"y":1.24,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":144,"b":48},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":430,"barmode":"overlay"},                        {"responsive": true}                    )                };            </script>        </div></div>
+    <div class="chart-wrap"><div>                            <div id="ed331e02-b29a-45d6-8d88-007f94446e3e" class="plotly-graph-div" style="height:360px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("ed331e02-b29a-45d6-8d88-007f94446e3e")) {                    Plotly.newPlot(                        "ed331e02-b29a-45d6-8d88-007f94446e3e",                        [{"marker":{"color":"#4fd1c5"},"name":"Model K RT: High Volatility Extreme","x":["Brier Score","Reliability","Resolution","Uncertainty","Brier From Decomp"],"y":[0.1685343607305936,0.016845542773281104,0.09781882112856914,0.24936927920602156,0.16839600085073353],"type":"bar"},{"marker":{"color":"#ff8f70"},"name":"Model M RT: High Volatility Extreme","x":["Brier Score","Reliability","Resolution","Uncertainty","Brier From Decomp"],"y":[0.18382199029942464,0.03531946700462454,0.1009759574474448,0.24936927920602156,0.1837127887632013],"type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"yaxis":{"title":{"text":"Metric value"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"font":{"color":"#e8f1fa"},"legend":{"font":{"size":11},"orientation":"h","x":0.0,"y":1.22,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":136,"b":48},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":360,"barmode":"group","xaxis":{"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"}},                        {"responsive": true}                    )                };            </script>        </div></div>
+  </section>
+
+  <h2>Metric Summary</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_focus</th>
+      <th>n_event_contracts_benchmark</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_focus</th>
+      <th>log_loss_benchmark</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>29</td>
+      <td>29</td>
+      <td>0</td>
+      <td>0.5205</td>
+      <td>0.5205</td>
+      <td>+0.0000</td>
+      <td>0.4803</td>
+      <td>0.5268</td>
+      <td>-0.0466</td>
+      <td>0.1805</td>
+      <td>0.1594</td>
+      <td>+0.0211</td>
+      <td>0.5217</td>
+      <td>0.4934</td>
+      <td>+0.0283</td>
+      <td>0.7397</td>
+      <td>0.7260</td>
+      <td>+0.0137</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>29</td>
+      <td>29</td>
+      <td>0</td>
+      <td>0.5068</td>
+      <td>0.5068</td>
+      <td>+0.0000</td>
+      <td>0.4125</td>
+      <td>0.4367</td>
+      <td>-0.0242</td>
+      <td>0.1953</td>
+      <td>0.1793</td>
+      <td>+0.0160</td>
+      <td>0.5461</td>
+      <td>0.5185</td>
+      <td>+0.0276</td>
+      <td>0.6027</td>
+      <td>0.7260</td>
+      <td>-0.1233</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>29</td>
+      <td>29</td>
+      <td>0</td>
+      <td>0.5479</td>
+      <td>0.5479</td>
+      <td>+0.0000</td>
+      <td>0.5557</td>
+      <td>0.6118</td>
+      <td>-0.0561</td>
+      <td>0.1756</td>
+      <td>0.1668</td>
+      <td>+0.0088</td>
+      <td>0.5214</td>
+      <td>0.5302</td>
+      <td>-0.0087</td>
+      <td>0.7671</td>
+      <td>0.8082</td>
+      <td>-0.0411</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>219</td>
+      <td>219</td>
+      <td>0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>0</td>
+      <td>0.5251</td>
+      <td>0.5251</td>
+      <td>+0.0000</td>
+      <td>0.4828</td>
+      <td>0.5251</td>
+      <td>-0.0423</td>
+      <td>0.1838</td>
+      <td>0.1685</td>
+      <td>+0.0153</td>
+      <td>0.5298</td>
+      <td>0.5140</td>
+      <td>+0.0157</td>
+      <td>0.7032</td>
+      <td>0.7534</td>
+      <td>-0.0502</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Brier Decomposition</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>reliability_focus</th>
+      <th>reliability_benchmark</th>
+      <th>reliability_delta</th>
+      <th>resolution_focus</th>
+      <th>resolution_benchmark</th>
+      <th>resolution_delta</th>
+      <th>uncertainty_focus</th>
+      <th>uncertainty_benchmark</th>
+      <th>uncertainty_delta</th>
+      <th>brier_from_decomposition_focus</th>
+      <th>brier_from_decomposition_benchmark</th>
+      <th>brier_from_decomposition_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.1805</td>
+      <td>0.1594</td>
+      <td>+0.0211</td>
+      <td>0.0643</td>
+      <td>0.0440</td>
+      <td>+0.0203</td>
+      <td>0.1321</td>
+      <td>0.1341</td>
+      <td>-0.0019</td>
+      <td>0.2496</td>
+      <td>0.2496</td>
+      <td>+0.0000</td>
+      <td>0.1817</td>
+      <td>0.1595</td>
+      <td>+0.0223</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.1953</td>
+      <td>0.1793</td>
+      <td>+0.0160</td>
+      <td>0.0744</td>
+      <td>0.0401</td>
+      <td>+0.0342</td>
+      <td>0.1293</td>
+      <td>0.1126</td>
+      <td>+0.0167</td>
+      <td>0.2500</td>
+      <td>0.2500</td>
+      <td>+0.0000</td>
+      <td>0.1950</td>
+      <td>0.1775</td>
+      <td>+0.0175</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.1756</td>
+      <td>0.1668</td>
+      <td>+0.0088</td>
+      <td>0.0462</td>
+      <td>0.0219</td>
+      <td>+0.0242</td>
+      <td>0.1185</td>
+      <td>0.1031</td>
+      <td>+0.0154</td>
+      <td>0.2477</td>
+      <td>0.2477</td>
+      <td>+0.0000</td>
+      <td>0.1754</td>
+      <td>0.1665</td>
+      <td>+0.0088</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>219</td>
+      <td>219</td>
+      <td>0</td>
+      <td>0.1838</td>
+      <td>0.1685</td>
+      <td>+0.0153</td>
+      <td>0.0353</td>
+      <td>0.0168</td>
+      <td>+0.0185</td>
+      <td>0.1010</td>
+      <td>0.0978</td>
+      <td>+0.0032</td>
+      <td>0.2494</td>
+      <td>0.2494</td>
+      <td>+0.0000</td>
+      <td>0.1837</td>
+      <td>0.1684</td>
+      <td>+0.0153</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Expanded Calibration Error</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>expected_calibration_error_focus</th>
+      <th>expected_calibration_error_benchmark</th>
+      <th>expected_calibration_error_delta</th>
+      <th>root_mean_squared_calibration_error_focus</th>
+      <th>root_mean_squared_calibration_error_benchmark</th>
+      <th>root_mean_squared_calibration_error_delta</th>
+      <th>max_calibration_error_focus</th>
+      <th>max_calibration_error_benchmark</th>
+      <th>max_calibration_error_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.1929</td>
+      <td>0.1733</td>
+      <td>+0.0196</td>
+      <td>0.2536</td>
+      <td>0.2097</td>
+      <td>+0.0439</td>
+      <td>0.5458</td>
+      <td>0.3500</td>
+      <td>+0.1958</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.2248</td>
+      <td>0.1575</td>
+      <td>+0.0673</td>
+      <td>0.2727</td>
+      <td>0.2004</td>
+      <td>+0.0723</td>
+      <td>0.8545</td>
+      <td>0.3686</td>
+      <td>+0.4859</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.1711</td>
+      <td>0.1218</td>
+      <td>+0.0493</td>
+      <td>0.2149</td>
+      <td>0.1481</td>
+      <td>+0.0668</td>
+      <td>0.4563</td>
+      <td>0.3150</td>
+      <td>+0.1413</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>219</td>
+      <td>219</td>
+      <td>0</td>
+      <td>0.1420</td>
+      <td>0.1161</td>
+      <td>+0.0259</td>
+      <td>0.1879</td>
+      <td>0.1298</td>
+      <td>+0.0581</td>
+      <td>0.4535</td>
+      <td>0.2200</td>
+      <td>+0.2335</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Sharpness</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>forecast_std_focus</th>
+      <th>forecast_std_benchmark</th>
+      <th>forecast_std_delta</th>
+      <th>sharpness_variance_from_base_rate_focus</th>
+      <th>sharpness_variance_from_base_rate_benchmark</th>
+      <th>sharpness_variance_from_base_rate_delta</th>
+      <th>mean_abs_distance_from_0_5_focus</th>
+      <th>mean_abs_distance_from_0_5_benchmark</th>
+      <th>mean_abs_distance_from_0_5_delta</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_focus</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_benchmark</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.5205</td>
+      <td>0.5205</td>
+      <td>+0.0000</td>
+      <td>0.4803</td>
+      <td>0.5268</td>
+      <td>-0.0466</td>
+      <td>0.2737</td>
+      <td>0.3107</td>
+      <td>-0.0370</td>
+      <td>0.0765</td>
+      <td>0.0966</td>
+      <td>-0.0200</td>
+      <td>0.2201</td>
+      <td>0.2678</td>
+      <td>-0.0477</td>
+      <td>0.1747</td>
+      <td>0.1528</td>
+      <td>+0.0219</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.5068</td>
+      <td>0.5068</td>
+      <td>+0.0000</td>
+      <td>0.4125</td>
+      <td>0.4367</td>
+      <td>-0.0242</td>
+      <td>0.2687</td>
+      <td>0.3079</td>
+      <td>-0.0391</td>
+      <td>0.0811</td>
+      <td>0.0997</td>
+      <td>-0.0186</td>
+      <td>0.2348</td>
+      <td>0.2722</td>
+      <td>-0.0374</td>
+      <td>0.1701</td>
+      <td>0.1512</td>
+      <td>+0.0189</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0.5479</td>
+      <td>0.5479</td>
+      <td>+0.0000</td>
+      <td>0.5557</td>
+      <td>0.6118</td>
+      <td>-0.0561</td>
+      <td>0.2743</td>
+      <td>0.3090</td>
+      <td>-0.0347</td>
+      <td>0.0753</td>
+      <td>0.0996</td>
+      <td>-0.0243</td>
+      <td>0.2293</td>
+      <td>0.2953</td>
+      <td>-0.0660</td>
+      <td>0.1716</td>
+      <td>0.1420</td>
+      <td>+0.0296</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>219</td>
+      <td>219</td>
+      <td>0</td>
+      <td>0.5251</td>
+      <td>0.5251</td>
+      <td>+0.0000</td>
+      <td>0.4828</td>
+      <td>0.5251</td>
+      <td>-0.0423</td>
+      <td>0.2785</td>
+      <td>0.3173</td>
+      <td>-0.0389</td>
+      <td>0.0793</td>
+      <td>0.1007</td>
+      <td>-0.0214</td>
+      <td>0.2281</td>
+      <td>0.2784</td>
+      <td>-0.0504</td>
+      <td>0.1722</td>
+      <td>0.1487</td>
+      <td>+0.0235</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Outcome Join Coverage</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>scope</th>
+      <th>value</th>
+      <th>total_forecast_rows_focus</th>
+      <th>total_forecast_rows_benchmark</th>
+      <th>total_forecast_rows_delta</th>
+      <th>matched_rows_focus</th>
+      <th>matched_rows_benchmark</th>
+      <th>matched_rows_delta</th>
+      <th>unmatched_rows_focus</th>
+      <th>unmatched_rows_benchmark</th>
+      <th>unmatched_rows_delta</th>
+      <th>match_rate_focus</th>
+      <th>match_rate_benchmark</th>
+      <th>match_rate_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>contract_label</td>
+      <td>ATM</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>OTM+1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>OTM-1</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>73</td>
+      <td>73</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>all</td>
+      <td>219</td>
+      <td>219</td>
+      <td>0</td>
+      <td>219</td>
+      <td>219</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260407_1000UTC__KXBTCD-26APR0707.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260407_1400UTC__KXBTCD-26APR0711.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260407_1900UTC__KXBTCD-26APR0716.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260408_1300UTC__KXBTCD-26APR0810.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260408_1400UTC__KXBTCD-26APR0811.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_1500UTC__KXBTCD-26APR0912.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_1400UTC__KXBTCD-26APR1011.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0100UTC__KXBTCD-26APR1122.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_2200UTC__KXBTCD-26APR1219.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260413_1300UTC__KXBTCD-26APR1310.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260413_1900UTC__KXBTCD-26APR1316.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260414_1300UTC__KXBTCD-26APR1410.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260416_1300UTC__KXBTCD-26APR1610.csv</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260416_1400UTC__KXBTCD-26APR1611.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_1200UTC__KXBTCD-26APR1709.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_1300UTC__KXBTCD-26APR1710.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_1400UTC__KXBTCD-26APR1711.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260419_2200UTC__KXBTCD-26APR1919.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260420_0700UTC__KXBTCD-26APR2004.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260420_1300UTC__KXBTCD-26APR2010.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260420_1400UTC__KXBTCD-26APR2011.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260420_1500UTC__KXBTCD-26APR2012.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260421_1400UTC__KXBTCD-26APR2111.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260421_1700UTC__KXBTCD-26APR2114.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260421_1900UTC__KXBTCD-26APR2116.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0200UTC__KXBTCD-26APR2123.csv</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0500UTC__KXBTCD-26APR2202.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_1400UTC__KXBTCD-26APR2211.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260423_1700UTC__KXBTCD-26APR2314.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Time Bucket Comparison</h2>
+  <section class="section-stack">
+    <section class="panel">
+      <h3>Isolated Minute Metrics</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_focus</th>
+      <th>n_event_contracts_benchmark</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_focus</th>
+      <th>log_loss_benchmark</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0.6667</td>
+      <td>0.6667</td>
+      <td>+0.0000</td>
+      <td>0.4622</td>
+      <td>0.4717</td>
+      <td>-0.0095</td>
+      <td>0.2542</td>
+      <td>0.2531</td>
+      <td>+0.0011</td>
+      <td>0.7014</td>
+      <td>0.6994</td>
+      <td>+0.0020</td>
+      <td>0.5556</td>
+      <td>0.4444</td>
+      <td>+0.1111</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+    <section class="panel">
+      <h3>10-Minute Bucket Metrics</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_focus</th>
+      <th>n_event_contracts_benchmark</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_focus</th>
+      <th>log_loss_benchmark</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>45</td>
+      <td>45</td>
+      <td>0</td>
+      <td>33</td>
+      <td>33</td>
+      <td>0</td>
+      <td>0.6667</td>
+      <td>0.6667</td>
+      <td>+0.0000</td>
+      <td>0.4296</td>
+      <td>0.4524</td>
+      <td>-0.0228</td>
+      <td>0.2636</td>
+      <td>0.2207</td>
+      <td>+0.0429</td>
+      <td>0.7195</td>
+      <td>0.6274</td>
+      <td>+0.0921</td>
+      <td>0.4667</td>
+      <td>0.6000</td>
+      <td>-0.1333</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>63</td>
+      <td>63</td>
+      <td>0</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>0.4286</td>
+      <td>0.4286</td>
+      <td>+0.0000</td>
+      <td>0.4220</td>
+      <td>0.4722</td>
+      <td>-0.0503</td>
+      <td>0.1787</td>
+      <td>0.1597</td>
+      <td>+0.0190</td>
+      <td>0.5323</td>
+      <td>0.4960</td>
+      <td>+0.0363</td>
+      <td>0.7302</td>
+      <td>0.7937</td>
+      <td>-0.0635</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>42</td>
+      <td>42</td>
+      <td>0</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>0.5714</td>
+      <td>0.5714</td>
+      <td>+0.0000</td>
+      <td>0.5915</td>
+      <td>0.6864</td>
+      <td>-0.0949</td>
+      <td>0.2017</td>
+      <td>0.1928</td>
+      <td>+0.0090</td>
+      <td>0.5816</td>
+      <td>0.5892</td>
+      <td>-0.0076</td>
+      <td>0.6667</td>
+      <td>0.7857</td>
+      <td>-0.1190</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0.5714</td>
+      <td>0.5714</td>
+      <td>+0.0000</td>
+      <td>0.5470</td>
+      <td>0.5381</td>
+      <td>+0.0089</td>
+      <td>0.1369</td>
+      <td>0.1214</td>
+      <td>+0.0155</td>
+      <td>0.4133</td>
+      <td>0.3589</td>
+      <td>+0.0544</td>
+      <td>0.8571</td>
+      <td>0.7619</td>
+      <td>+0.0952</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0.2857</td>
+      <td>0.2857</td>
+      <td>+0.0000</td>
+      <td>0.4226</td>
+      <td>0.4776</td>
+      <td>-0.0551</td>
+      <td>0.2357</td>
+      <td>0.2626</td>
+      <td>-0.0269</td>
+      <td>0.6808</td>
+      <td>0.8801</td>
+      <td>-0.1993</td>
+      <td>0.7143</td>
+      <td>0.6190</td>
+      <td>+0.0952</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>0.5926</td>
+      <td>0.5926</td>
+      <td>+0.0000</td>
+      <td>0.5414</td>
+      <td>0.5457</td>
+      <td>-0.0044</td>
+      <td>0.0311</td>
+      <td>0.0279</td>
+      <td>+0.0032</td>
+      <td>0.1001</td>
+      <td>0.0862</td>
+      <td>+0.0139</td>
+      <td>0.9630</td>
+      <td>0.9630</td>
+      <td>+0.0000</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+    <section class="panel">
+      <h3>Accuracy Evaluation</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>correct_forecasts_focus</th>
+      <th>correct_forecasts_benchmark</th>
+      <th>correct_forecasts_delta</th>
+      <th>incorrect_forecasts_focus</th>
+      <th>incorrect_forecasts_benchmark</th>
+      <th>incorrect_forecasts_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+      <th>classification_accuracy_pct_focus</th>
+      <th>classification_accuracy_pct_benchmark</th>
+      <th>classification_accuracy_pct_delta</th>
+      <th>threshold_focus</th>
+      <th>threshold_benchmark</th>
+      <th>threshold_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>5</td>
+      <td>4</td>
+      <td>1</td>
+      <td>4</td>
+      <td>5</td>
+      <td>-1</td>
+      <td>0.5556</td>
+      <td>0.4444</td>
+      <td>+0.1111</td>
+      <td>55.56</td>
+      <td>44.44</td>
+      <td>+11.11</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>45</td>
+      <td>45</td>
+      <td>0</td>
+      <td>21</td>
+      <td>27</td>
+      <td>-6</td>
+      <td>24</td>
+      <td>18</td>
+      <td>6</td>
+      <td>0.4667</td>
+      <td>0.6000</td>
+      <td>-0.1333</td>
+      <td>46.67</td>
+      <td>60.00</td>
+      <td>-13.33</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>63</td>
+      <td>63</td>
+      <td>0</td>
+      <td>46</td>
+      <td>50</td>
+      <td>-4</td>
+      <td>17</td>
+      <td>13</td>
+      <td>4</td>
+      <td>0.7302</td>
+      <td>0.7937</td>
+      <td>-0.0635</td>
+      <td>73.02</td>
+      <td>79.37</td>
+      <td>-6.35</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>42</td>
+      <td>42</td>
+      <td>0</td>
+      <td>28</td>
+      <td>33</td>
+      <td>-5</td>
+      <td>14</td>
+      <td>9</td>
+      <td>5</td>
+      <td>0.6667</td>
+      <td>0.7857</td>
+      <td>-0.1190</td>
+      <td>66.67</td>
+      <td>78.57</td>
+      <td>-11.90</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>18</td>
+      <td>16</td>
+      <td>2</td>
+      <td>3</td>
+      <td>5</td>
+      <td>-2</td>
+      <td>0.8571</td>
+      <td>0.7619</td>
+      <td>+0.0952</td>
+      <td>85.71</td>
+      <td>76.19</td>
+      <td>+9.52</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>15</td>
+      <td>13</td>
+      <td>2</td>
+      <td>6</td>
+      <td>8</td>
+      <td>-2</td>
+      <td>0.7143</td>
+      <td>0.6190</td>
+      <td>+0.0952</td>
+      <td>71.43</td>
+      <td>61.90</td>
+      <td>+9.52</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>26</td>
+      <td>26</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0.9630</td>
+      <td>0.9630</td>
+      <td>+0.0000</td>
+      <td>96.30</td>
+      <td>96.30</td>
+      <td>+0.00</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+    <section class="panel">
+      <h3>Brier Decomposition By Bucket</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>reliability_focus</th>
+      <th>reliability_benchmark</th>
+      <th>reliability_delta</th>
+      <th>resolution_focus</th>
+      <th>resolution_benchmark</th>
+      <th>resolution_delta</th>
+      <th>uncertainty_focus</th>
+      <th>uncertainty_benchmark</th>
+      <th>uncertainty_delta</th>
+      <th>brier_from_decomposition_focus</th>
+      <th>brier_from_decomposition_benchmark</th>
+      <th>brier_from_decomposition_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0.2542</td>
+      <td>0.2531</td>
+      <td>+0.0011</td>
+      <td>0.0966</td>
+      <td>0.0579</td>
+      <td>+0.0387</td>
+      <td>0.0741</td>
+      <td>0.0278</td>
+      <td>+0.0463</td>
+      <td>0.2222</td>
+      <td>0.2222</td>
+      <td>+0.0000</td>
+      <td>0.2447</td>
+      <td>0.2523</td>
+      <td>-0.0076</td>
+    </tr>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>45</td>
+      <td>45</td>
+      <td>0</td>
+      <td>0.2636</td>
+      <td>0.2207</td>
+      <td>+0.0429</td>
+      <td>0.0979</td>
+      <td>0.0610</td>
+      <td>+0.0368</td>
+      <td>0.0627</td>
+      <td>0.0593</td>
+      <td>+0.0034</td>
+      <td>0.2222</td>
+      <td>0.2222</td>
+      <td>+0.0000</td>
+      <td>0.2574</td>
+      <td>0.2240</td>
+      <td>+0.0334</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>63</td>
+      <td>63</td>
+      <td>0</td>
+      <td>0.1787</td>
+      <td>0.1597</td>
+      <td>+0.0190</td>
+      <td>0.0588</td>
+      <td>0.0292</td>
+      <td>+0.0296</td>
+      <td>0.1232</td>
+      <td>0.1198</td>
+      <td>+0.0034</td>
+      <td>0.2449</td>
+      <td>0.2449</td>
+      <td>+0.0000</td>
+      <td>0.1805</td>
+      <td>0.1543</td>
+      <td>+0.0262</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>42</td>
+      <td>42</td>
+      <td>0</td>
+      <td>0.2017</td>
+      <td>0.1928</td>
+      <td>+0.0090</td>
+      <td>0.0759</td>
+      <td>0.0515</td>
+      <td>+0.0244</td>
+      <td>0.1188</td>
+      <td>0.1003</td>
+      <td>+0.0185</td>
+      <td>0.2449</td>
+      <td>0.2449</td>
+      <td>+0.0000</td>
+      <td>0.2020</td>
+      <td>0.1961</td>
+      <td>+0.0059</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0.1369</td>
+      <td>0.1214</td>
+      <td>+0.0155</td>
+      <td>0.0702</td>
+      <td>0.0804</td>
+      <td>-0.0102</td>
+      <td>0.1774</td>
+      <td>0.1973</td>
+      <td>-0.0198</td>
+      <td>0.2449</td>
+      <td>0.2449</td>
+      <td>+0.0000</td>
+      <td>0.1377</td>
+      <td>0.1280</td>
+      <td>+0.0097</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0.2357</td>
+      <td>0.2626</td>
+      <td>-0.0269</td>
+      <td>0.1448</td>
+      <td>0.1110</td>
+      <td>+0.0338</td>
+      <td>0.1168</td>
+      <td>0.0612</td>
+      <td>+0.0556</td>
+      <td>0.2041</td>
+      <td>0.2041</td>
+      <td>+0.0000</td>
+      <td>0.2321</td>
+      <td>0.2539</td>
+      <td>-0.0218</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>0.0311</td>
+      <td>0.0279</td>
+      <td>+0.0032</td>
+      <td>0.0155</td>
+      <td>0.0276</td>
+      <td>-0.0121</td>
+      <td>0.2229</td>
+      <td>0.2414</td>
+      <td>-0.0185</td>
+      <td>0.2414</td>
+      <td>0.2414</td>
+      <td>+0.0000</td>
+      <td>0.0340</td>
+      <td>0.0276</td>
+      <td>+0.0064</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+  </section>
+
+  <h2>Resolution Audit Mismatches</h2>
+  <section class="section-stack">
+    <section class="panel">
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>scope</th>
+      <th>audit_mismatches</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Model M RT: High Volatility Extreme</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>Model K RT: High Volatility Extreme</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table></div>
+      <p class="chart-note">
+        These audit mismatches are diagnostic only. They compare official Kalshi settlement results
+        against the Binance strike audit already used by the existing scripts and are not scored as truth.
+      </p>
+    </section>
+    <section class="panel">
+      <div class='table-grid'><section><h3>Model M RT: High Volatility Extreme</h3><div class='table-wrap'><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>event_ticker</th>
+      <th>event_datetime_utc</th>
+      <th>contract_label</th>
+      <th>market_ticker</th>
+      <th>strike</th>
+      <th>official_result</th>
+      <th>outcome</th>
+      <th>binance_audit_price</th>
+      <th>binance_audit_outcome</th>
+      <th>source_file</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table></div></section><section><h3>Model K RT: High Volatility Extreme</h3><div class='table-wrap'><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>event_ticker</th>
+      <th>event_datetime_utc</th>
+      <th>contract_label</th>
+      <th>market_ticker</th>
+      <th>strike</th>
+      <th>official_result</th>
+      <th>outcome</th>
+      <th>binance_audit_price</th>
+      <th>binance_audit_outcome</th>
+      <th>source_file</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table></div></section></div>
+    </section>
+  </section>
+
+  <h2>Volatility Threshold Context</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>threshold_name</th>
+      <th>percentile</th>
+      <th>window_hours</th>
+      <th>latest_realized_volatility_cutoff</th>
+      <th>median_realized_volatility_cutoff</th>
+      <th>min_realized_volatility_cutoff</th>
+      <th>max_realized_volatility_cutoff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Low Volatility Extreme</td>
+      <td>0.1000</td>
+      <td>72</td>
+      <td>0.0025</td>
+      <td>0.0024</td>
+      <td>0.0014</td>
+      <td>0.0029</td>
+    </tr>
+    <tr>
+      <td>Low Volatility</td>
+      <td>0.2500</td>
+      <td>72</td>
+      <td>0.0030</td>
+      <td>0.0029</td>
+      <td>0.0018</td>
+      <td>0.0033</td>
+    </tr>
+    <tr>
+      <td>High Volatility</td>
+      <td>0.7500</td>
+      <td>72</td>
+      <td>0.0049</td>
+      <td>0.0050</td>
+      <td>0.0036</td>
+      <td>0.0058</td>
+    </tr>
+    <tr>
+      <td>High Volatility Extreme</td>
+      <td>0.9000</td>
+      <td>72</td>
+      <td>0.0063</td>
+      <td>0.0066</td>
+      <td>0.0049</td>
+      <td>0.0076</td>
+    </tr>
+  </tbody>
+</table></div>
+    <p class="chart-note">
+      The real-time volatility segmentation uses a trailing <code>72</code>-hour
+      window, equivalent to <code>4320</code> Binance one-minute observations.
+    </p>
+  </section>
+
+  <h2>Assumptions</h2>
+  <section class="panel">
+    <ul><li>Model M forecast values are interpreted as YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.</li><li>Scored event outcome is the official Kalshi contract result: 1 for YES resolved, 0 for NO resolved.</li><li>Forecast rows are joined to outcomes by exact Kalshi market ticker when available; legacy price files without market tickers fall back to event_ticker + contract_label + strike.</li><li>Event tickers are interpreted as the contract settlement/end hour, matching the price fetcher&#x27;s hour_end_utc -&gt; New York event ticker convention.</li><li>Binance prices are diagnostic only. They may be used for strike matching upstream and audit mismatch checks, but never as the scored truth label.</li><li>Events present in the Kalshi price files but absent from the settlement CSV are excluded from scoring and counted in outcome_join_coverage.csv.</li><li>Model M probabilities include an isotonic regression layer fit only on high-volatility-extreme historical minutes outside the Kalshi settlement/pricing backtest range.</li><li>When present, Model M raw_probability diagnostics are the pre-isotonic Monte Carlo YES probabilities and calibrated_probability diagnostics are the post-isotonic probabilities used for scoring.</li><li>Kalshi prices are YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.</li><li>Volatility decomposition uses Binance BTCUSDT 1-minute candles aligned to each scored Kalshi forecast hour.</li><li>Hourly realized volatility is defined as sqrt(sum(log(close/open)^2)) across the 60 one-minute Binance bars inside the forecast hour.</li><li>Real-time classification uses the trailing 72-hour (4320-minute) Binance window available at each scored hour.</li><li>Rolling cutoff summaries in this run: q10 latest=0.00251833, median=0.00243236, range=[0.00136078, 0.00287415]; q25 latest=0.00302169, median=0.00286087, range=[0.00177498, 0.00325354]; q75 latest=0.00487723, median=0.00501546, range=[0.00363224, 0.00576850]; q90 latest=0.00632642, median=0.00655630, range=[0.00494499, 0.00758148].</li><li>Low Volatility includes hours with realized volatility &lt;= trailing q25; Standard Volatility includes trailing q25 &lt; realized volatility &lt; trailing q75; High Volatility includes realized volatility &gt;= trailing q75.</li></ul>
+  </section>
+
+  <h2>Run Notes</h2>
+  <section class="panel">
+    <ul><li>Loaded official Kalshi contract outcomes from kalshi_btc_atm_settlements.csv.</li><li>Reused hourly volatility segment table from /Users/socks/Repositories/Volatility-Specific-Probabilistic-Classification-BTC-Model/Model_M_Volatility_Decomposition_RT/Model_M_Volatility_Decomposition_RT_outputs/p_gt_0_15/hourly_market_volatility_segments.csv.</li><li>Volatility bins use the same trailing 72-hour real-time realized-volatility definition as the existing Model_K volatility scripts.</li><li>Dashboard charts and tables are rendered in dark mode and keep the same overall layout as Model_K_Volatility_Results_Dashboard.</li><li>Cross-model scoring metrics in this family are computed only on the exact overlapping scored rows keyed by event_contract_id + forecast_datetime_utc.</li></ul>
+    <p class="chart-note"><a href="../index.html">Back to dashboard index</a></p>
+  </section>
+</main>
+</body>
+</html>

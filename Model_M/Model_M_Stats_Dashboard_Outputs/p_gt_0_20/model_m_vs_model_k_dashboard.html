@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model M vs Model K Dashboard</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07131d;
+      --bg-2: #0b1823;
+      --panel: #10202d;
+      --panel-2: #142736;
+      --line: #22394b;
+      --line-soft: rgba(255,255,255,0.05);
+      --ink: #e8f1fa;
+      --muted: #96aabd;
+      --blue: #6cb6ff;
+      --orange: #ff8f70;
+      --good: #35c7b7;
+      --warn: #fbbf24;
+      --pill: #122736;
+    }
+    html {
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(108, 182, 255, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(255, 143, 112, 0.15), transparent 28%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 34px 24px 54px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 18px;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--ink);
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    a {
+      color: #9aceff;
+    }
+    .hero {
+      padding: 24px 24px 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        var(--panel);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 16px 40px rgba(0,0,0,0.18);
+    }
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a9c7e2;
+    }
+    .lead {
+      max-width: 920px;
+      margin: 14px 0 0;
+      font-size: 15px;
+    }
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--pill);
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012)), var(--panel-2);
+    }
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .metric-card strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1.05;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+        var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      padding: 20px 20px 18px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.01);
+    }
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 10px 11px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+      position: sticky;
+      top: 0;
+    }
+    .data-table td {
+      color: var(--ink);
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .chart-wrap {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .chart-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    code {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Comparative Model Evaluation</p>
+    <h1>Model M vs Model K</h1>
+    <p class="lead">
+      This dashboard compares Model M and Model K on the exact overlapping scored-row universe,
+      using the dark visual style of the volatility comparison dashboard while focusing on direct
+      model-versus-model performance.
+    </p>
+    <div class="hero-pills">
+      <span class="pill">Common scored rows: 470</span>
+      <span class="pill">Common event contracts: 261</span>
+      <span class="pill">Common events: 87</span>
+      <span class="pill">Model M Brier: 0.1452</span>
+      <span class="pill">Model K Brier: 0.1200</span>
+    </div>
+  </section>
+
+  <h2>Topline Comparison</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>metric</th>
+      <th>model_m</th>
+      <th>model_k</th>
+      <th>delta_g_minus_k</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Scored rows</td>
+      <td>470.0000</td>
+      <td>470.0000</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <td>Event contracts</td>
+      <td>261.0000</td>
+      <td>261.0000</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <td>Brier score</td>
+      <td>0.1452</td>
+      <td>0.1200</td>
+      <td>0.0252</td>
+    </tr>
+    <tr>
+      <td>Log loss</td>
+      <td>0.4399</td>
+      <td>0.3669</td>
+      <td>0.0731</td>
+    </tr>
+    <tr>
+      <td>ECE</td>
+      <td>0.1020</td>
+      <td>0.0342</td>
+      <td>0.0677</td>
+    </tr>
+    <tr>
+      <td>Forecast std</td>
+      <td>0.2643</td>
+      <td>0.3461</td>
+      <td>-0.0819</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Chart Comparison</h2>
+  <div class='section-stack'><div class='chart-wrap'><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="4a0770ce-0688-4b21-a338-601299f94ec3" class="plotly-graph-div" style="height:430px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("4a0770ce-0688-4b21-a338-601299f94ec3")) {                    Plotly.newPlot(                        "4a0770ce-0688-4b21-a338-601299f94ec3",                        [{"line":{"color":"#8ea3b7","dash":"dash"},"mode":"lines","name":"Perfect","x":[0,1],"y":[0,1],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#6cb6ff","width":3},"marker":{"color":"#6cb6ff","size":8},"mode":"lines+markers","name":"Model M","x":{"dtype":"f8","bdata":"1Np6s0h1oD8HPmqaOSfDP0HrtvUOHdA\u002f8T9\u002frOc61j88en8gIdXcP2WVWnydZeE\u002fkTSWOXF65D+VU2tkLLjnP5x5pyt6Ces\u002fEb6yh6U27z8="},"y":{"dtype":"f8","bdata":"AAAAAAAAAACIxvrQWB+6P1BQUFBQUNA\u002fFBQUFBQU1D+SPQNR6cjeP85u4VdjIu0\u002fo4suuuii6z+pXYnalajtP97d3d3d3e0\u002fAAAAAAAA8D8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#ff8f70","width":3},"marker":{"color":"#ff8f70","size":8},"mode":"lines+markers","name":"Model K","x":{"dtype":"f8","bdata":"H3BMVxzKmj8cu82x2xzDPwU+hLSFZc8\u002fap\u002fA6GPD1j+CLdiCLdjcPwgWgWARCOI\u002fuacRlnsa5T9WUT5Bo\u002fbnPyn+SPbKFes\u002fF\u002fkn9B\u002fH7j8="},"y":{"dtype":"f8","bdata":"W79SoNavhD9ddNFFF13EPx3UQR3UQc0\u002f0LrBFPms2z85juM4juPYP3zwwQcffOA\u002ffBphuacR5j+amZmZmZnpP57YiZ3Yie0\u002fY6CEN5o67z8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"marker":{"color":"#6cb6ff"},"name":"Model M","opacity":0.6,"x":{"dtype":"f8","bdata":"NNoNTJN3wT\u002fhdgYHRsK0P\u002fo+mFj7C9c\u002fMMOSCwJQyT\u002fvgHbyyffDPwkpw+Agd88\u002fcRenxDNzwT\u002fVUQESo+S6P0c9jtuzt8g\u002fCdAw177Qxj\u002frDNw9mE3AP4AVMmJTWcw\u002fhluhp4Jv5z\u002f+vlGwrmPlP6C7ikjwAes\u002f2vdI1eyO0j9hK\u002fQ4oxTGPyybdwwHhOI\u002f4x8\u002faI1z4D8JXh8DvtDdP8YMCILZReQ\u002fpfEbgw+smD8ZeYPLw42DP170DVkw3aU\u002fAAAAAAAAAAAAAAAAAAAAALgy\u002fox0yYs\u002fsFMLVg1X5D8Vkkef+7XhP3RgWCCDaeg\u002fmXOQAtgI2z\u002fT0PZxvKjUP1uOhI9Q994\u002fOkSGT+2PtT+d4UaU7UCXP0FfV0CGLsA\u002fbzHHRFP8tT+YO0VKZbCUP+IFcykuScA\u002fNM4tCxWl2T9+9S\u002fbC8nPPzfzSB6IvNw\u002fmd11KRa2yj9ZeeLsTvq7PzLwV\u002f83S+A\u002fxLSsy7U22D8vm51noF7NPyo66fDsndw\u002f9bAYfWaI1T9NTnlQKqTLPyCwxVmr9tk\u002fXVcAQqH+vD+XWQ5Me7O1PztHJc+3FcI\u002f82uIAbRIoD\u002fchrSMDz2FPwmYnPq4vrU\u002fkw56pzqUrz99ZSNhsyOXP6oTlyh+Erw\u002fcnlRFs+0lD8CG+i0gU5rP5d4YAE3Z7E\u002fnI3u+a8QfD8AAAAAAAAAADHIj89+vaA\u002fAAAAAAAAAAAAAAAAAAAAAM012yolynk\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdUWkdyRV3D\u002fM0J1pEkXaP7W2kLQq2+E\u002fODVcfD1A3D9BXSGbGm3ZP+PG3JTB\u002f+A\u002fyvrOidKZ2j9y4lTdCXrTPy8aTgAYMt0\u002fB+2uKV4vyj+YHlst9QTFP1MFOelx5dM\u002fAAAAAAAA8D8OwsIonlrvPwAAAAAAAPA\u002fb+ZSnnwc1z8D83oGGdrSP7N1+tRfCd4\u002fmpmZmZmZ6T8BwE9UfaLnP92QXk6twes\u002f\u002fImObOsztD84wE\u002f\u002fm1GhP52qzegoj8A\u002f1g030YHK4z\u002fKCe0x0hLOPx5kXTDKN+s\u002frBbhLit3xz8iO2geJp65P1F9hJoSKNg\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvTiFn3y64D8NcUSfW8fRP7ULN1JTPug\u002fVtEfC3mo4D8WvVYGeD\u002fRPy3tz2XkAOg\u002fG4SoL+9K4j+fhZWk0kfQP72Y40VhVes\u002fAAAAAAAA8D8AAAAAAADwPwAAAAAAAPA\u002fuSpONJYI5z96ZD9pl7jPP\u002frrtD6g++4\u002fC7JyO2pK3j+gnFvFpEXUP5ZS2BSLteA\u002f9aa4DMXdwD9WnorvETKkP4yLkea4E+I\u002fELs\u002ffhyQ4D+1uxuBZl7bPy0fXmGq6uE\u002ffTL8bsi\u002f4T9+AXlJPwbaP+GFyC26s+g\u002fBotA9IiA3T9InPPy+bjSP8ouwyQY3eA\u002fiYZUCFRL3T9\u002fnaszL1XSPymROdsV5uA\u002fFPGfEb6ctT9vspNsoSiIP1haQOfvtdU\u002f3sh3TwSS4D850A1WHbzdPwZX\u002fwSR2uQ\u002fjWmVlpeR4T8E7OXOQ7jdP1gWm+4+B+c\u002fCKRKlI+j4D\u002feMOClgyjTP3U4Smwhtec\u002fOlgdJjXh1T\u002fL4T9qWNK2PyP9syH9s+k\u002fTPozcc1t4D\u002faFqdubNTYP1myVvOiheI\u002f4jmNB3Zd4D\u002fGuvb+pzvYP3mVeMa4a+I\u002fblRr\u002fzaS4D+Msa9bD4bZP\u002fvwJUDn\u002f+I\u002fOOecc8453z9Nw59NWpvFP64IedSu+eg\u002fchzHcRzH4T+s+uBGMLHBP9M5PDbFX+0\u002fFoaYEBcI3j8Zge5eip\u002fWP6sh9POmjuM\u002fAAAAAAAAAAAAAAAAAAAAAJprOGLaE1k\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3GJPrswN2j+tksKIL3fOP7I7z3sLFOE\u002ffriTOI10zz8eUpp8bwXEP4CWAHiPBd8\u002fzdlSnS3V0T\u002fmzyWAw\u002f\u002fDP7qekFDdV98\u002fNRx0U9eS3j9Y8cKxBiDWPxqEPl\u002fEPOI\u002f+nVde4Nu4D8BSZlRUgPbP9NcczzOfOM\u002fdnEw\u002f0dL2z9uNMoW3FnTP5JMNfO2+OA\u002fr6bs\u002f2a41D\u002fLpjyyWFPNP2Gk\u002f6uqId4\u002fb66LR7\u002f03T+nI+IIZyHTPy1Ks4xS6t8\u002f+LCSkFYY4T9Qiq8emM3UPyxYgPRN4OY\u002fYFd5BSAi4D9hGWNSf3fSPwq2S9o\u002f4uY\u002fnZ5nEeeO4j9xjr3Ja73UPwlDZ6x5sug\u002fkxwn3x7p3D+3evdPbDnUP4RIW7aiqOA\u002fW5D1Sc153D9E2N+zFfHTPxOO7Pcmz+A\u002fcYMmtmVa2z99Ywjv0D\u002fTPyy2EyuBt+A\u002fDrv60cWnxD8dBqMxWcOiP5tVyQVD9uA\u002f1WcwbnUh3D\u002f97Pu1lA3UP6AlwbKmH+I\u002fWFGLqJks2z93qTffJlXRP2MiPKU6MeI\u002f6a2IUwJ53j9w0odBCPbYP3CX4pp11+I\u002fQjg42V4n3D\u002fM0tsKquLWP+u+C9vGGOE\u002f8jdXrQBn2j9EeOoiHW\u002fPP4TnIbtshOA\u002fx+rjdYdG2z+XBXv1K8DQP341UdqrI+E\u002fmaJ5mL0Z1T\u002fIowGTJpDNP7TF1WSTk90\u002fKyWmNkZZsD9PgeMBFjhuP+vA66THTMc\u002fXVIJItER3j9CMg1jOWvSP7aipnyo8eY\u002fPR64m35g3D\u002fP0fgu4ZPMPwJesxQdceU\u002ftIXVijmZ3D\u002f3xd\u002fhq9XEP2Q9VQ\u002fdWOc\u002fvh3eQzKV4D8BtMu4JnzbPxBq4kwrQeQ\u002feF3Kv2WPxT8D4xRyrti1P9I8kMNyidU\u002fQ0M7TExUxT+zKRpBR5OkP9jj8q3dQOE\u002fjnQqTOcgwT\u002f+EZr4LkC5PyS0l9BeQss\u002ff6ae1VDpyT8X\u002ft\u002fnFTK8PwxfTOD30Ng\u002fAAAAAAAA4D\u002fMXG7o9oLSP\u002f1HD3Wt4OY\u002f4SJ\u002fT1WZqz9SQpssi0aQP0LDH0v8OrY\u002fAAAAAAAAAACO7yWFMJhfP86BeuBdoNQ\u002f0ewW\u002fLZQxz+UzgbP89vgPyjyWTeYIs8\u002fI6N8bUCawj8zb0Sj4HfeP0QJw+Cp0L4\u002f4Z4MUAPxsD+mLMK9T\u002fPEP5S7vFZU8ck\u002fLkw4YqxuwT8E1YFVJ+HTP+lxLft247Q\u002fWHZ1SwAOqT\u002fDPva4N1PBP5TPBH+To9k\u002fA\u002fDTzhWY0j9pRIJ9VuPfP73FkM5bDNk\u002fNOkcRywx0T+32mEcSR7fP1kbay35DNQ\u002fcaUnTtCQxz+kqjt5+ezdPxjr164uodQ\u002fJItUd0xqzT8\u002fauaGGeHcP74Hhq2Ebbg\u002fWSjPW0LVpj+xIM9ahZ\u002fBPyUpUBPXIug\u002f5omSh0i35j9mssNhI8\u002fpP5m20MRUa+Y\u002fWry3F8pz4z\u002fyGQ1\u002fkXDnP75ugPiBiOQ\u002fxcPUAXC83j\u002f\u002fgR+ftJbnP0o2A\u002f909Oo\u002ffVMd\u002fh9i5T9dkIFNKE\u002fvP3uJ9d9qAuk\u002fnQl25kSt5j8OMFJ0lrjqP2SQ2QHqIeY\u002fQPklgPwK4D8IILCFSujnP8H0FMQJQOU\u002fE+O8UP+i3T+t0DqUFcLnPyYCNa\u002fOu9A\u002fIahQANMLyj9ITGL70AXaP+67caNxTu4\u002fl0NYaKIg5z8AAAAAAADwP+0s4VRqFtc\u002f2UHDHIcnzz8414C0jRndP2e3SR36f90\u002fAukJo+oz1D+kgOZaiZDiPwAAAAAAAPA\u002fuhtiqi2O7T8AAAAAAADwP0BuRgJxpds\u002f7g8yXusJ1D\u002fbRMWmR0vhP+eWNqhifd4\u002fWRL8Pr2b2T\u002f\u002f9TSbmJXjP2b7XoKukOI\u002fpW3QgdoG3T+Pj8fk6N\u002fmP19+2xQrDOE\u002fhmpJRLPd3j82a5KRZ3fiP7WSATDTjDk\u002fAAAAAAAAAACImGBz3EiCP55+o7Kffdk\u002fF20tI+ZQzT9Nw4xDSh3hP4xe3RZUHts\u002fmhz9dWw40j+Db8nbz0rhPwJd6lz8dto\u002f5F1cPqS+zT+rPwQNz3ThP6qS1ey7gts\u002fqQTtxJ+tzT\u002fi0Xns6L7iP3ZRkQxSWNk\u002fx5NVIbO0yj\u002f7w+ECFpDhP5sgLLlqZdk\u002fGBlMtcd6yT8Vm1DcLk3jP8ylGWW8f9Q\u002fR4jDkQgCxz9PdLuRh3HhPwJQrlRfeMM\u002f1TSCmAZXoj8BR3QYDLjUP9z4x4xZ2rU\u002f+HKFsQdilj8Ti3tBQpzPP61qbMEMucY\u002fTi4pSXMkwz+ikLT7ZQnRP0oceO3SXcM\u002fFa7RB7Exsz+Ikpbz1hXTP+K+xpgs5uA\u002fOTcPm7R32z9vROhNGNviPws5YLanquE\u002f1QhFAwRi3T\u002fo04P+4X3lP9MRygAZxeY\u002fi0lkvzbe4T8EruLWcEXrP+1nltn+Mdk\u002fARRhesRn0D+EWjTPczLePwRX1D2+Yug\u002fVjQEzFYY5D9vEtfW6m3sP+HsQbcqUOs\u002fLLUTUS7B5j9W0OpLBa3uP2\u002fO7uRmhuM\u002fDHZcUw203z9h5ef1+2nnP+dpkSWRZOU\u002ftoOn4+4P4j+c4ZhoNIbmP5SiIJg32bo\u002fVv1ohzwcsz8B4bm53I3JPwTIra7Awdc\u002fG\u002f0Xmcra0T9\u002fu91ppKDeP1Aw9rpiK+s\u002f8Wc8ELLR6D\u002f\u002fiqTqXWLrP48CeRq7gOI\u002fqmNnf3dE1T8CNaFVeF\u002foPyPSTZE+rt4\u002fp0M\u002fvwQNwz+z3txi7hzpP7C8ccvLdd0\u002fxSUXOXz5vj8JY5TEQ4vpP\u002f3X7E\u002f\u002f2Ok\u002fAzTjtHa45j9FgFUw7aLrP8ge7VL\u002fjNk\u002fW+Bqt1fa1j\u002f7\u002fQJwuhXcPxnYOZXcGOQ\u002fTB7Owyoi3j8Ecd5Hv3fnPzN5J04db+4\u002fY1oos5Cr7T8amjN7tEjvP0xfpokbmu4\u002f9k9gxK7z7T96lENph5\u002fvPwAAAAAAAPA\u002fAAAAAAAA8D8AAAAAAADwP2oArw+AO94\u002fzHqUD+Dr2T\u002fL3MPz40HhPwXuciLaKt0\u002fkg0gYGbO1z\u002fujcbsdU\u002fgP8KExa512NQ\u002fkgSc5b2Kzj9e1+aFd6fZPyoMREwg5eQ\u002f+NPB3pv\u002f3D9zkGjc6oXoP9BCxCTCK+I\u002fcJNHhM1Y1j9VfZCZJAjoPw=="},"xbins":{"end":1.0,"size":0.05,"start":0.0},"type":"histogram","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"#ff8f70"},"name":"Model K","opacity":0.6,"x":{"dtype":"f8","bdata":"uB6F61G4vj+kcD0K16OwP0jhehSuR9E\u002fPQrXo3A9yj\u002fsUbgehevBPz0K16NwPdI\u002fSOF6FK5HwT+79Shcj8K1P\u002fYoXI\u002fC9cg\u002f9ihcj8L1yD+kcD0K16PAP+xRuB6F69E\u002fH4XrUbge7T9wPQrXo3DpP4\u002fC9Shcj+4\u002fKVyPwvUo1D97FK5H4Xq0P2ZmZmZmZuY\u002fFK5H4XoU4j9I4XoUrkfZPzMzMzMzM+c\u002fuB6F61G4nj97FK5H4XqEPylcj8L1KKw\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002f16NwPQrX5z+F61G4HoXjPwrXo3A9Cus\u002fzczMzMzM3D\u002fB9Shcj8LVP5DC9Shcj+I\u002fexSuR+F6dD97FK5H4Xp0P+xRuB6F66E\u002fexSuR+F6dD97FK5H4Xp0P+xRuB6F66E\u002fcT0K16Nw1T\u002f2KFyPwvXIP\u002fYoXI\u002fC9eA\u002fZmZmZmZmxj+4HoXrUbiePz4K16NwPeY\u002fzczMzMzM1D+PwvUoXI\u002fCP7gehetRuOI\u002fexSuR+F61D8UrkfhehTOPzMzMzMzM9s\u002fmpmZmZmZmT97FK5H4Xp0Pylcj8L1KKw\u002fexSuR+F6hD97FK5H4Xp0P+xRuB6F66E\u002fuB6F61G4jj97FK5H4Xp0P5qZmZmZmak\u002fexSuR+F6dD97FK5H4Xp0P7gehetRuI4\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fMzMzMzMz2z8K16NwPQrXP8P1KFyPwuE\u002fMzMzMzMz2z8UrkfhehTWP5qZmZmZmeE\u002fXI\u002fC9Shc1z\u002f2KFyPwvXQPwrXo3A9Ct8\u002fmpmZmZmZyT9pPQrXo3C9P83MzMzMzNQ\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002f7FG4HoXr2T9I4XoUrkfRPx+F61G4HuE\u002f9ihcj8L17D8K16NwPQrrP4\u002fC9Shcj+4\u002f7FG4HoXroT97FK5H4Xp0Px+F61G4HsU\u002fPQrXo3A97j8pXI\u002fC9SjcP4XrUbgehe8\u002fKVyPwvUovD\u002fsUbgeheuhP5qZmZmZmdk\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfheoQ\u002fCtejcD0K5z8bhetRuB7FP2ZmZmZmZu4\u002fzczMzMzM5D\u002fXo3A9CtfDP+F6FK5H4e4\u002fFK5H4XoU6j\u002fsUbgehevBPzMzMzMzM+8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002fXI\u002fC9Shc6z\u002fXo3A9CtfDPzMzMzMzM+8\u002fFK5H4XoU3j9SuB6F61HQP4\u002fC9Shcj+Y\u002fmpmZmZmZmT97FK5H4Xp0PzQzMzMzM+M\u002fPQrXo3A95j9SuB6F61HYP6RwPQrXo+w\u002fwvUoXI\u002fC6T8fhetRuB7VP+F6FK5H4e4\u002fj8L1KFyP4j9tPQrXo3DNPwAAAAAAAOw\u002fFK5H4XoU3j+PwvUoXI\u002fCP4\u002fC9Shcj+o\u002fuB6F61G4nj97FK5H4Xp0P65H4XoUrus\u002fzczMzMzM6D\u002fhehSuR+HaP+xRuB6F6+0\u002fUrgehetR7D+4HoXrUbjeP+F6FK5H4e4\u002fXI\u002fC9Shc6z\u002fhehSuR+HKPzMzMzMzM+8\u002f16NwPQrX5z97FK5H4XqEP9ejcD0K1+8\u002fmpmZmZmZ5T\u002fXo3A9CtfTP\u002fYoXI\u002fC9ew\u002fZmZmZmZm5j9cj8L1KFzXP3E9CtejcO0\u002fKVyPwvUo6D+PwvUoXI\u002faP3E9CtejcO0\u002frkfhehSu6z\u002fsUbgeheuxP9ejcD0K1+8\u002fj8L1KFyP7j8pXI\u002fC9SisP9ejcD0K1+8\u002fcT0K16Nw4T+amZmZmZnRPx+F61G4Huk\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002frkfhehSu1z8fhetRuB7FPx+F61G4HuU\u002fbT0K16NwzT+kcD0K16OwP2ZmZmZmZuI\u002frkfhehSuxz8K16NwPQqnPx+F61G4HuE\u002fSOF6FK5H5T8zMzMzMzPbPxSuR+F6FOo\u002fCtejcD0K4z\u002f2KFyPwvXYP0jhehSuR+k\u002fwfUoXI\u002fC3T+amZmZmZnRP3E9CtejcOU\u002fAAAAAAAA2D+F61G4HoXLP65H4XoUruM\u002fXI\u002fC9Shc4z8zMzMzMzPbP3sUrkfheug\u002f4XoUrkfh5j8pXI\u002fC9SjMP2ZmZmZmZu4\u002fFK5H4XoU5j+uR+F6FK7HPxSuR+F6FO4\u002fAAAAAAAA7D8dhetRuB7VPwrXo3A9Cu8\u002fMzMzMzMz2z\u002fJzMzMzMzMP3E9CtejcOk\u002frkfhehSu3z\u002fhehSuR+HKP3E9CtejcOk\u002frkfhehSu3z+\u002f9Shcj8LFPz4K16NwPeo\u002fuB6F61G4rj97FK5H4Xp0P5qZmZmZme0\u002fbz0K16Nw3T+uR+F6FK7HP6RwPQrXo+g\u002fCtejcD0K4z\u002f2KFyPwvXQPwrXo3A9Cus\u002fMzMzMzMz5z+amZmZmZnZP5qZmZmZme0\u002fwfUoXI\u002fC3T\u002fJzMzMzMzMP4\u002fC9Shcj+Y\u002fUrgehetR2D9SuB6F61HIP7gehetRuOY\u002f9ihcj8L12D\u002f2KFyPwvXIP7gehetRuOY\u002fmpmZmZmZ0T+4HoXrUbi+P65H4XoUrt8\u002fmpmZmZmZmT97FK5H4Xp0P289CtejcN0\u002fAAAAAAAA5D9pPQrXo3C9P4\u002fC9Shcj+4\u002fFK5H4XoU6j8AAAAAAADQPzMzMzMzM+8\u002fwvUoXI\u002fC5T+F61G4HoXLP1yPwvUoXO8\u002fwvUoXI\u002fC4T\u002fhehSuR+HaP+xRuB6F6+U\u002fSOF6FK5HwT+4HoXrUbieP1yPwvUoXN8\u002fexSuR+F6xD97FK5H4XqUP83MzMzMzOw\u002fCtejcD0Kpz+amZmZmZmZP+F6FK5H4bo\u002fuB6F61G4vj\u002fsUbgeheuhP+F6FK5H4do\u002fKVyPwvUo6D89CtejcD3SPz0K16NwPe4\u002fCtejcD0Kpz+4HoXrUbieP2k9CtejcL0\u002fexSuR+F6dD97FK5H4Xp0Pylcj8L1KNQ\u002f4XoUrkfhuj9I4XoUrkflPxSuR+F6FNY\u002fUrgehetRuD+PwvUoXI\u002fmPwrXo3A9Cqc\u002fmpmZmZmZmT9pPQrXo3C9Px+F61G4HsU\u002fMzMzMzMzsz\u002f2KFyPwvXYP+xRuB6F66E\u002fexSuR+F6lD8K16NwPQqnPwAAAAAAAOQ\u002fPQrXo3A92j9xPQrXo3DpPz0K16NwPco\u002f7FG4HoXrwT\u002fXo3A9CtfTP8H1KFyPwtU\u002fj8L1KFyPwj+F61G4HoXjP9ejcD0K19s\u002fzczMzMzM1D+amZmZmZnhP1K4HoXrUbg\u002fCtejcD0Kpz\u002f2KFyPwvXIPylcj8L1KOw\u002f7FG4HoXr6T+amZmZmZntP2ZmZmZmZuo\u002f16NwPQrX5z8pXI\u002fC9SjsP8P1KFyPwu0\u002f16NwPQrX5z8K16NwPQrvP4XrUbgehe8\u002fUrgehetR7D+uR+F6FK7vPwrXo3A9Cus\u002fKVyPwvUo6D9I4XoUrkftP+xRuB6F6+k\u002frkfhehSu4z+amZmZmZntP2ZmZmZmZuo\u002fAAAAAAAA5D\u002fsUbgehevtPz0K16NwPco\u002faT0K16NwvT8zMzMzMzPbP4XrUbgehe8\u002f9ihcj8L15D\u002fXo3A9CtfvP\u002fYoXI\u002fC9dg\u002f4XoUrkfhyj+F61G4HoXjP+F6FK5H4eI\u002fzczMzMzM1D+PwvUoXI\u002fqP9ejcD0K1+8\u002fhetRuB6F7z\u002fXo3A9CtfvP289CtejcN0\u002fFK5H4XoU1j\u002fhehSuR+HiP0jhehSuR+U\u002fSOF6FK5H4T9xPQrXo3DpP4XrUbgehec\u002f4XoUrkfh4j+4HoXrUbjqP0jhehSuR+E\u002fFK5H4XoU3j\u002fhehSuR+HiP3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P2ZmZmZmZuI\u002fFK5H4XoUzj\u002fXo3A9CtfrP83MzMzMzOA\u002fzczMzMzMzD+4HoXrUbjqPwrXo3A9Ct8\u002fSOF6FK5HwT+uR+F6FK7rPxSuR+F6FOI\u002fSOF6FK5HwT\u002f2KFyPwvXsP3sUrkfheuA\u002fmpmZmZmZuT9I4XoUrkftP1yPwvUoXNc\u002fCtejcD0Kpz\u002f2KFyPwvXsP83MzMzMzMw\u002fmpmZmZmZmT9mZmZmZmbqP5qZmZmZmZk\u002fexSuR+F6dD\u002fB9Shcj8LVP3sUrkfheoQ\u002fexSuR+F6dD+4HoXrUbi+PzMzMzMzM8M\u002fpHA9CtejsD+PwvUoXI\u002fSPzMzMzMzM9M\u002fUrgehetRuD8K16NwPQrnPzMzMzMzM+c\u002f7FG4HoXr4T8K16NwPQrrPxSuR+F6FOo\u002fPQrXo3A95j\u002f2KFyPwvXsP+F6FK5H4e4\u002fcT0K16Nw7T\u002fXo3A9CtfvP2ZmZmZmZt4\u002fj8L1KFyP0j+amZmZmZnlP65H4XoUru8\u002fmpmZmZmZ7T\u002fXo3A9CtfvP9ejcD0K1+8\u002fPQrXo3A97j\u002fXo3A9CtfvPwAAAAAAAOg\u002fuB6F61G44j+4HoXrUbjqP4XrUbgehes\u002fexSuR+F66D9I4XoUrkftP7v1KFyPwrU\u002fuB6F61G4jj9cj8L1KFzPP8P1KFyPwuE\u002fSOF6FK5H2T89CtejcD3mPz0K16NwPe4\u002fmpmZmZmZ7T\u002fhehSuR+HuP4XrUbgehec\u002fXI\u002fC9Shczz+PwvUoXI\u002fuPz0K16NwPeY\u002fKVyPwvUorD8zMzMzMzPvP5qZmZmZmeU\u002fCtejcD0Kpz+F61G4HoXvPwrXo3A9Cu8\u002fPQrXo3A97j8zMzMzMzPvP2ZmZmZmZt4\u002fPQrXo3A92j9mZmZmZmbiPwAAAAAAAOg\u002fSOF6FK5H4T\u002fNzMzMzMzsP4XrUbgehe8\u002fhetRuB6F7z8zMzMzMzPvP1yPwvUoXO8\u002fMzMzMzMz7z9cj8L1KFzvP9ejcD0K1+8\u002f16NwPQrX7z\u002fXo3A9CtfvPxSuR+F6FOI\u002fSOF6FK5H2T+uR+F6FK7nPxSuR+F6FOI\u002fpHA9Ctej2D97FK5H4XroP7gehetRuM4\u002fAAAAAAAAwD+F61G4HoXbP2ZmZmZmZuo\u002fAAAAAAAA4D8K16NwPQrvP8L1KFyPwuk\u002fZmZmZmZm1j8zMzMzMzPvPw=="},"xbins":{"end":1.0,"size":0.05,"start":0.0},"type":"histogram","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.45],"title":{"text":"Mean probability"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Observed frequency"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"xaxis2":{"anchor":"y2","domain":[0.55,1.0],"title":{"text":"Predicted probability"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Count"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Calibration Overlay","x":0.225,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Probability Distribution Overlay","x":0.775,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"}],"font":{"color":"#e8f1fa"},"legend":{"orientation":"h","x":0.0,"y":1.22,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":136,"b":48},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":430,"barmode":"overlay"},                        {"responsive": true}                    )                };            </script>        </div><div>                            <div id="46936daa-73cb-4c11-b12e-66820c510a01" class="plotly-graph-div" style="height:430px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("46936daa-73cb-4c11-b12e-66820c510a01")) {                    Plotly.newPlot(                        "46936daa-73cb-4c11-b12e-66820c510a01",                        [{"marker":{"color":"#6cb6ff"},"name":"Model M","x":["Brier","Reliability","Resolution","Uncertainty","From Decomp"],"y":[0.14522249374957316,0.025478569723181455,0.1292560559833843,0.24977818017202352,0.1460006939118207],"type":"bar","xaxis":"x","yaxis":"y"},{"marker":{"color":"#ff8f70"},"name":"Model K","x":["Brier","Reliability","Resolution","Uncertainty","From Decomp"],"y":[0.12001127659574465,0.0017782710452038547,0.1317894852217626,0.24977818017202352,0.1197669659954648],"type":"bar","xaxis":"x","yaxis":"y"},{"line":{"color":"#6cb6ff","width":3},"marker":{"color":"#6cb6ff","size":7},"mode":"lines+markers","name":"Model M","x":["Minutes 1-10","Minutes 11-20","Minutes 21-30","Minutes 31-40","Minutes 41-50","Minutes 51-60"],"y":{"dtype":"f8","bdata":"seHM1Ijuyj8gWBLlaGXIP16nyUcO0cg\u002fAOgHlNaMvT+dq+lu8mK5PyEHt2ETzbM\u002f"},"type":"scatter","xaxis":"x2","yaxis":"y2"},{"line":{"color":"#ff8f70","width":3},"marker":{"color":"#ff8f70","size":7},"mode":"lines+markers","name":"Model K","x":["Minutes 1-10","Minutes 11-20","Minutes 21-30","Minutes 31-40","Minutes 41-50","Minutes 51-60"],"y":{"dtype":"f8","bdata":"LOzscBbwxz\u002fNfGA6fjDDPwt72uGvycg\u002fC+AtkKC4sT8SYcPTK8WzPydMyY9vHqs\u002f"},"type":"scatter","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.45],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Metric value"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"xaxis2":{"anchor":"y2","domain":[0.55,1.0],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Brier score"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Brier Decomposition Comparison","x":0.225,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"10-Minute Bucket Brier Trend","x":0.775,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"}],"font":{"color":"#e8f1fa"},"legend":{"orientation":"h","x":0.0,"y":1.22,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":136,"b":48},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":430,"barmode":"group"},                        {"responsive": true}                    )                };            </script>        </div></div></div>
+
+  <h2>Metric Summary</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_a</th>
+      <th>n_forecasts_k</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_a</th>
+      <th>n_event_contracts_k</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_a</th>
+      <th>base_rate_k</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_a</th>
+      <th>mean_p_kalshi_k</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_a</th>
+      <th>brier_score_k</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_a</th>
+      <th>log_loss_k</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_a</th>
+      <th>classification_accuracy_k</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>0</td>
+      <td>0.4968</td>
+      <td>0.4968</td>
+      <td>0.0000</td>
+      <td>0.4077</td>
+      <td>0.4811</td>
+      <td>-0.0735</td>
+      <td>0.1515</td>
+      <td>0.1203</td>
+      <td>0.0312</td>
+      <td>0.4542</td>
+      <td>0.3740</td>
+      <td>0.0802</td>
+      <td>0.8025</td>
+      <td>0.8217</td>
+      <td>-0.0191</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>156</td>
+      <td>156</td>
+      <td>0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>0</td>
+      <td>0.3013</td>
+      <td>0.3013</td>
+      <td>0.0000</td>
+      <td>0.2937</td>
+      <td>0.2870</td>
+      <td>0.0067</td>
+      <td>0.1401</td>
+      <td>0.1307</td>
+      <td>0.0094</td>
+      <td>0.4242</td>
+      <td>0.3924</td>
+      <td>0.0318</td>
+      <td>0.8077</td>
+      <td>0.8013</td>
+      <td>0.0064</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>0</td>
+      <td>0.6561</td>
+      <td>0.6561</td>
+      <td>0.0000</td>
+      <td>0.5281</td>
+      <td>0.6598</td>
+      <td>-0.1317</td>
+      <td>0.1440</td>
+      <td>0.1091</td>
+      <td>0.0350</td>
+      <td>0.4413</td>
+      <td>0.3343</td>
+      <td>0.1069</td>
+      <td>0.8535</td>
+      <td>0.8408</td>
+      <td>0.0127</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>470</td>
+      <td>470</td>
+      <td>0</td>
+      <td>261</td>
+      <td>261</td>
+      <td>0</td>
+      <td>0.4851</td>
+      <td>0.4851</td>
+      <td>0.0000</td>
+      <td>0.4101</td>
+      <td>0.4764</td>
+      <td>-0.0663</td>
+      <td>0.1452</td>
+      <td>0.1200</td>
+      <td>0.0252</td>
+      <td>0.4399</td>
+      <td>0.3669</td>
+      <td>0.0731</td>
+      <td>0.8213</td>
+      <td>0.8213</td>
+      <td>0.0000</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Brier Decomposition</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_a</th>
+      <th>n_forecasts_k</th>
+      <th>n_forecasts_delta</th>
+      <th>brier_score_a</th>
+      <th>brier_score_k</th>
+      <th>brier_score_delta</th>
+      <th>reliability_a</th>
+      <th>reliability_k</th>
+      <th>reliability_delta</th>
+      <th>resolution_a</th>
+      <th>resolution_k</th>
+      <th>resolution_delta</th>
+      <th>uncertainty_a</th>
+      <th>uncertainty_k</th>
+      <th>uncertainty_delta</th>
+      <th>brier_from_decomposition_a</th>
+      <th>brier_from_decomposition_k</th>
+      <th>brier_from_decomposition_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>0.1515</td>
+      <td>0.1203</td>
+      <td>0.0312</td>
+      <td>0.0362</td>
+      <td>0.0094</td>
+      <td>0.0268</td>
+      <td>0.1342</td>
+      <td>0.1381</td>
+      <td>-0.0038</td>
+      <td>0.2500</td>
+      <td>0.2500</td>
+      <td>0.0000</td>
+      <td>0.1520</td>
+      <td>0.1213</td>
+      <td>0.0307</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>156</td>
+      <td>156</td>
+      <td>0</td>
+      <td>0.1401</td>
+      <td>0.1307</td>
+      <td>0.0094</td>
+      <td>0.0113</td>
+      <td>0.0079</td>
+      <td>0.0034</td>
+      <td>0.0813</td>
+      <td>0.0882</td>
+      <td>-0.0069</td>
+      <td>0.2105</td>
+      <td>0.2105</td>
+      <td>0.0000</td>
+      <td>0.1406</td>
+      <td>0.1302</td>
+      <td>0.0103</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>0.1440</td>
+      <td>0.1091</td>
+      <td>0.0350</td>
+      <td>0.0425</td>
+      <td>0.0104</td>
+      <td>0.0320</td>
+      <td>0.1225</td>
+      <td>0.1278</td>
+      <td>-0.0053</td>
+      <td>0.2256</td>
+      <td>0.2256</td>
+      <td>0.0000</td>
+      <td>0.1456</td>
+      <td>0.1083</td>
+      <td>0.0373</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>470</td>
+      <td>470</td>
+      <td>0</td>
+      <td>0.1452</td>
+      <td>0.1200</td>
+      <td>0.0252</td>
+      <td>0.0255</td>
+      <td>0.0018</td>
+      <td>0.0237</td>
+      <td>0.1293</td>
+      <td>0.1318</td>
+      <td>-0.0025</td>
+      <td>0.2498</td>
+      <td>0.2498</td>
+      <td>0.0000</td>
+      <td>0.1460</td>
+      <td>0.1198</td>
+      <td>0.0262</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Expanded Calibration Error</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_a</th>
+      <th>n_forecasts_k</th>
+      <th>n_forecasts_delta</th>
+      <th>expected_calibration_error_a</th>
+      <th>expected_calibration_error_k</th>
+      <th>expected_calibration_error_delta</th>
+      <th>root_mean_squared_calibration_error_a</th>
+      <th>root_mean_squared_calibration_error_k</th>
+      <th>root_mean_squared_calibration_error_delta</th>
+      <th>max_calibration_error_a</th>
+      <th>max_calibration_error_k</th>
+      <th>max_calibration_error_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>0.1326</td>
+      <td>0.0803</td>
+      <td>0.0522</td>
+      <td>0.1904</td>
+      <td>0.0969</td>
+      <td>0.0934</td>
+      <td>0.4219</td>
+      <td>0.1823</td>
+      <td>0.2395</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>156</td>
+      <td>156</td>
+      <td>0</td>
+      <td>0.0659</td>
+      <td>0.0527</td>
+      <td>0.0132</td>
+      <td>0.1065</td>
+      <td>0.0889</td>
+      <td>0.0176</td>
+      <td>0.4556</td>
+      <td>0.3600</td>
+      <td>0.0956</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>0.1680</td>
+      <td>0.0638</td>
+      <td>0.1042</td>
+      <td>0.2061</td>
+      <td>0.1022</td>
+      <td>0.1039</td>
+      <td>0.3238</td>
+      <td>0.2982</td>
+      <td>0.0256</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>470</td>
+      <td>470</td>
+      <td>0</td>
+      <td>0.1020</td>
+      <td>0.0342</td>
+      <td>0.0677</td>
+      <td>0.1596</td>
+      <td>0.0422</td>
+      <td>0.1175</td>
+      <td>0.3668</td>
+      <td>0.0768</td>
+      <td>0.2900</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Sharpness</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_a</th>
+      <th>n_forecasts_k</th>
+      <th>n_forecasts_delta</th>
+      <th>base_rate_a</th>
+      <th>base_rate_k</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_a</th>
+      <th>mean_p_kalshi_k</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>forecast_std_a</th>
+      <th>forecast_std_k</th>
+      <th>forecast_std_delta</th>
+      <th>sharpness_variance_from_base_rate_a</th>
+      <th>sharpness_variance_from_base_rate_k</th>
+      <th>sharpness_variance_from_base_rate_delta</th>
+      <th>mean_abs_distance_from_0_5_a</th>
+      <th>mean_abs_distance_from_0_5_k</th>
+      <th>mean_abs_distance_from_0_5_delta</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_a</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_k</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>0.4968</td>
+      <td>0.4968</td>
+      <td>0.0000</td>
+      <td>0.4077</td>
+      <td>0.4811</td>
+      <td>-0.0735</td>
+      <td>0.2467</td>
+      <td>0.3218</td>
+      <td>-0.0751</td>
+      <td>0.0688</td>
+      <td>0.1038</td>
+      <td>-0.0350</td>
+      <td>0.2051</td>
+      <td>0.2786</td>
+      <td>-0.0735</td>
+      <td>0.1806</td>
+      <td>0.1461</td>
+      <td>0.0345</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>156</td>
+      <td>156</td>
+      <td>0</td>
+      <td>0.3013</td>
+      <td>0.3013</td>
+      <td>0.0000</td>
+      <td>0.2937</td>
+      <td>0.2870</td>
+      <td>0.0067</td>
+      <td>0.2292</td>
+      <td>0.2826</td>
+      <td>-0.0534</td>
+      <td>0.0526</td>
+      <td>0.0801</td>
+      <td>-0.0275</td>
+      <td>0.2716</td>
+      <td>0.3213</td>
+      <td>-0.0498</td>
+      <td>0.1549</td>
+      <td>0.1248</td>
+      <td>0.0302</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>157</td>
+      <td>157</td>
+      <td>0</td>
+      <td>0.6561</td>
+      <td>0.6561</td>
+      <td>0.0000</td>
+      <td>0.5281</td>
+      <td>0.6598</td>
+      <td>-0.1317</td>
+      <td>0.2620</td>
+      <td>0.3263</td>
+      <td>-0.0643</td>
+      <td>0.0850</td>
+      <td>0.1065</td>
+      <td>-0.0214</td>
+      <td>0.2080</td>
+      <td>0.3298</td>
+      <td>-0.1218</td>
+      <td>0.1806</td>
+      <td>0.1180</td>
+      <td>0.0625</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>470</td>
+      <td>470</td>
+      <td>0</td>
+      <td>0.4851</td>
+      <td>0.4851</td>
+      <td>0.0000</td>
+      <td>0.4101</td>
+      <td>0.4764</td>
+      <td>-0.0663</td>
+      <td>0.2643</td>
+      <td>0.3461</td>
+      <td>-0.0819</td>
+      <td>0.0755</td>
+      <td>0.1199</td>
+      <td>-0.0444</td>
+      <td>0.2281</td>
+      <td>0.3099</td>
+      <td>-0.0817</td>
+      <td>0.1721</td>
+      <td>0.1296</td>
+      <td>0.0424</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Notes</h2>
+  <section class="panel">
+    <ul><li>Model M source directory: /Users/socks/Repositories/Volatility-Specific-Probabilistic-Classification-BTC-Model/Model_M/model_M_Evals_Outputs/p_gt_0_20</li><li>Model K source directory: /Users/socks/Repositories/Volatility-Specific-Probabilistic-Classification-BTC-Model/Model_K/Model_K_outputs</li><li>Comparative dashboard restricts both models to the exact overlapping scored-row universe using event_contract_id + forecast_datetime_utc.</li><li>Overlap rows: 470; overlap event contracts: 261.</li></ul>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model M Market Minute Bucket Summary</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: #0f1b2d;
+      --ink: #e6eefb;
+      --muted: #92a4c0;
+      --line: #22324b;
+      --soft: #132238;
+      --blue: #6ea8ff;
+      --teal: #35c7b7;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 34px 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .compact-chart-grid {
+      margin-bottom: 18px;
+    }
+    .chart {
+      width: 100%;
+      min-height: 240px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .wide-chart {
+      min-height: 320px;
+      margin-bottom: 18px;
+    }
+    .chart-title {
+      font-size: 15px;
+      font-weight: 650;
+      fill: var(--ink);
+    }
+    .axis {
+      stroke: #64748b;
+      stroke-width: 1;
+    }
+    .grid {
+      stroke: #1e2c42;
+      stroke-width: 1;
+    }
+    .diag {
+      fill: none;
+      stroke: #7c8ba1;
+      stroke-width: 1.5;
+      stroke-dasharray: 5 5;
+    }
+    .series {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 3;
+    }
+    circle {
+      fill: var(--blue);
+    }
+    .axis-label, .tick {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .data-table th, .data-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+    }
+    .data-table th {
+      background: var(--soft);
+      color: var(--ink);
+      font-weight: 650;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    code {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 2px 5px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Model M: Market Minute Buckets</h1>
+  <p>
+    Buckets are based on elapsed market minute, where source <code>minute_number = 0</code> is
+    displayed as <code>Minute 1</code>. Minute 1 and minute 30 are isolated single-minute views;
+    the 10-minute buckets are inclusive elapsed-market ranges such as 1-10, 11-20, and so on.
+    These bucket views intentionally overlap for isolated minute 1 and minute 30.
+  </p>
+
+  <h2>Isolated Minute Metrics</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts</th>
+      <th>n_event_contracts</th>
+      <th>base_rate</th>
+      <th>mean_p_kalshi</th>
+      <th>brier_score</th>
+      <th>log_loss</th>
+      <th>classification_accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>66</td>
+      <td>66</td>
+      <td>0.636364</td>
+      <td>0.461569</td>
+      <td>0.239204</td>
+      <td>0.671144</td>
+      <td>0.621212</td>
+    </tr>
+    <tr>
+      <td>Minute 30</td>
+      <td>39</td>
+      <td>39</td>
+      <td>0.512821</td>
+      <td>0.382079</td>
+      <td>0.195939</td>
+      <td>0.567629</td>
+      <td>0.692308</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>10-Minute Bucket Metrics</h2>
+  
+    <svg class="chart wide-chart" viewBox="0 0 860 360" role="img" aria-label="Brier Score By 10-Minute Bucket">
+      <text x="64" y="22" class="chart-title">Brier Score By 10-Minute Bucket</text>
+      <line x1='64' y1='290.0' x2='832' y2='290.0' class='grid' /><text x='54' y='294.0' class='tick' text-anchor='end'>0.000</text><line x1='64' y1='226.0' x2='832' y2='226.0' class='grid' /><text x='54' y='230.0' class='tick' text-anchor='end'>0.065</text><line x1='64' y1='162.0' x2='832' y2='162.0' class='grid' /><text x='54' y='166.0' class='tick' text-anchor='end'>0.130</text><line x1='64' y1='98.0' x2='832' y2='98.0' class='grid' /><text x='54' y='102.0' class='tick' text-anchor='end'>0.195</text><line x1='64' y1='34.0' x2='832' y2='34.0' class='grid' /><text x='54' y='38.0' class='tick' text-anchor='end'>0.260</text>
+      <line x1="64" y1="290" x2="832" y2="290" class="axis" />
+      <line x1="64" y1="34" x2="64" y2="290" class="axis" />
+      <polyline points="64.0,67.4 217.6,104.4 371.2,110.9 524.8,148.9 678.4,171.3 832.0,236.5" class="series" />
+      <circle cx='64.0' cy='67.4' r='4'><title>Minutes 1-10: 0.22582</title></circle>
+<circle cx='217.6' cy='104.4' r='4'><title>Minutes 11-20: 0.18830</title></circle>
+<circle cx='371.2' cy='110.9' r='4'><title>Minutes 21-30: 0.18170</title></circle>
+<circle cx='524.8' cy='148.9' r='4'><title>Minutes 31-40: 0.14312</title></circle>
+<circle cx='678.4' cy='171.3' r='4'><title>Minutes 41-50: 0.12037</title></circle>
+<circle cx='832.0' cy='236.5' r='4'><title>Minutes 51-60: 0.05424</title></circle>
+      <text x='64.0' y='312' class='tick' text-anchor='middle'>1-10</text>
+<text x='217.6' y='312' class='tick' text-anchor='middle'>11-20</text>
+<text x='371.2' y='312' class='tick' text-anchor='middle'>21-30</text>
+<text x='524.8' y='312' class='tick' text-anchor='middle'>31-40</text>
+<text x='678.4' y='312' class='tick' text-anchor='middle'>41-50</text>
+<text x='832.0' y='312' class='tick' text-anchor='middle'>51-60</text>
+      <text x="448.0" y="344" class="axis-label" text-anchor="middle">Market Minute</text>
+      <text x="16" y="46" class="axis-label">Brier</text>
+    </svg>
+    
+  <div class='chart-grid compact-chart-grid'>
+    <svg class="chart wide-chart" viewBox="0 0 520 300" role="img" aria-label="Reliability By 10-Minute Bucket">
+      <text x="64" y="22" class="chart-title">Reliability By 10-Minute Bucket</text>
+      <line x1='64' y1='230.0' x2='492' y2='230.0' class='grid' /><text x='54' y='234.0' class='tick' text-anchor='end'>0.000</text><line x1='64' y1='181.0' x2='492' y2='181.0' class='grid' /><text x='54' y='185.0' class='tick' text-anchor='end'>0.009</text><line x1='64' y1='132.0' x2='492' y2='132.0' class='grid' /><text x='54' y='136.0' class='tick' text-anchor='end'>0.018</text><line x1='64' y1='83.0' x2='492' y2='83.0' class='grid' /><text x='54' y='87.0' class='tick' text-anchor='end'>0.027</text><line x1='64' y1='34.0' x2='492' y2='34.0' class='grid' /><text x='54' y='38.0' class='tick' text-anchor='end'>0.036</text>
+      <line x1="64" y1="230" x2="492" y2="230" class="axis" />
+      <line x1="64" y1="34" x2="64" y2="230" class="axis" />
+      <polyline points="64.0,60.6 149.6,104.6 235.2,83.4 320.8,59.6 406.4,155.0 492.0,173.7" class="series" />
+      <circle cx='64.0' cy='60.6' r='4'><title>Minutes 1-10: 0.03139</title></circle>
+<circle cx='149.6' cy='104.6' r='4'><title>Minutes 11-20: 0.02324</title></circle>
+<circle cx='235.2' cy='83.4' r='4'><title>Minutes 21-30: 0.02718</title></circle>
+<circle cx='320.8' cy='59.6' r='4'><title>Minutes 31-40: 0.03159</title></circle>
+<circle cx='406.4' cy='155.0' r='4'><title>Minutes 41-50: 0.01390</title></circle>
+<circle cx='492.0' cy='173.7' r='4'><title>Minutes 51-60: 0.01044</title></circle>
+      <text x='64.0' y='252' class='tick' text-anchor='middle'>1-10</text>
+<text x='149.6' y='252' class='tick' text-anchor='middle'>11-20</text>
+<text x='235.2' y='252' class='tick' text-anchor='middle'>21-30</text>
+<text x='320.8' y='252' class='tick' text-anchor='middle'>31-40</text>
+<text x='406.4' y='252' class='tick' text-anchor='middle'>41-50</text>
+<text x='492.0' y='252' class='tick' text-anchor='middle'>51-60</text>
+      <text x="278.0" y="284" class="axis-label" text-anchor="middle">Market Minute</text>
+      <text x="16" y="46" class="axis-label">Reliability</text>
+    </svg>
+    
+    <svg class="chart wide-chart" viewBox="0 0 520 300" role="img" aria-label="Resolution By 10-Minute Bucket">
+      <text x="64" y="22" class="chart-title">Resolution By 10-Minute Bucket</text>
+      <line x1='64' y1='230.0' x2='492' y2='230.0' class='grid' /><text x='54' y='234.0' class='tick' text-anchor='end'>0.000</text><line x1='64' y1='181.0' x2='492' y2='181.0' class='grid' /><text x='54' y='185.0' class='tick' text-anchor='end'>0.059</text><line x1='64' y1='132.0' x2='492' y2='132.0' class='grid' /><text x='54' y='136.0' class='tick' text-anchor='end'>0.118</text><line x1='64' y1='83.0' x2='492' y2='83.0' class='grid' /><text x='54' y='87.0' class='tick' text-anchor='end'>0.177</text><line x1='64' y1='34.0' x2='492' y2='34.0' class='grid' /><text x='54' y='38.0' class='tick' text-anchor='end'>0.236</text>
+      <line x1="64" y1="230" x2="492" y2="230" class="axis" />
+      <line x1="64" y1="34" x2="64" y2="230" class="axis" />
+      <polyline points="64.0,195.5 149.6,164.8 235.2,156.3 320.8,117.2 406.4,111.4 492.0,59.6" class="series" />
+      <circle cx='64.0' cy='195.5' r='4'><title>Minutes 1-10: 0.04151</title></circle>
+<circle cx='149.6' cy='164.8' r='4'><title>Minutes 11-20: 0.07836</title></circle>
+<circle cx='235.2' cy='156.3' r='4'><title>Minutes 21-30: 0.08853</title></circle>
+<circle cx='320.8' cy='117.2' r='4'><title>Minutes 31-40: 0.13555</title></circle>
+<circle cx='406.4' cy='111.4' r='4'><title>Minutes 41-50: 0.14253</title></circle>
+<circle cx='492.0' cy='59.6' r='4'><title>Minutes 51-60: 0.20479</title></circle>
+      <text x='64.0' y='252' class='tick' text-anchor='middle'>1-10</text>
+<text x='149.6' y='252' class='tick' text-anchor='middle'>11-20</text>
+<text x='235.2' y='252' class='tick' text-anchor='middle'>21-30</text>
+<text x='320.8' y='252' class='tick' text-anchor='middle'>31-40</text>
+<text x='406.4' y='252' class='tick' text-anchor='middle'>41-50</text>
+<text x='492.0' y='252' class='tick' text-anchor='middle'>51-60</text>
+      <text x="278.0" y="284" class="axis-label" text-anchor="middle">Market Minute</text>
+      <text x="16" y="46" class="axis-label">Resolution</text>
+    </svg>
+    </div>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts</th>
+      <th>n_event_contracts</th>
+      <th>base_rate</th>
+      <th>mean_p_kalshi</th>
+      <th>brier_score</th>
+      <th>log_loss</th>
+      <th>classification_accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>618</td>
+      <td>354</td>
+      <td>0.605178</td>
+      <td>0.454299</td>
+      <td>0.225815</td>
+      <td>0.640895</td>
+      <td>0.619741</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>471</td>
+      <td>282</td>
+      <td>0.549894</td>
+      <td>0.468012</td>
+      <td>0.188300</td>
+      <td>0.560638</td>
+      <td>0.740977</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>381</td>
+      <td>252</td>
+      <td>0.574803</td>
+      <td>0.462772</td>
+      <td>0.181701</td>
+      <td>0.542602</td>
+      <td>0.732283</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>423</td>
+      <td>288</td>
+      <td>0.539007</td>
+      <td>0.465920</td>
+      <td>0.143118</td>
+      <td>0.451277</td>
+      <td>0.820331</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>468</td>
+      <td>276</td>
+      <td>0.512821</td>
+      <td>0.466613</td>
+      <td>0.120368</td>
+      <td>0.390607</td>
+      <td>0.850427</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>429</td>
+      <td>255</td>
+      <td>0.475524</td>
+      <td>0.453050</td>
+      <td>0.054235</td>
+      <td>0.188178</td>
+      <td>0.939394</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Accuracy Evaluation</h2>
+  <p class="note">Accuracy uses the same threshold classification rule as the main summary.</p>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts</th>
+      <th>correct_forecasts</th>
+      <th>incorrect_forecasts</th>
+      <th>classification_accuracy_pct</th>
+      <th>threshold</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>66</td>
+      <td>41</td>
+      <td>25</td>
+      <td>62.121212</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minute 30</td>
+      <td>39</td>
+      <td>27</td>
+      <td>12</td>
+      <td>69.230769</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>618</td>
+      <td>383</td>
+      <td>235</td>
+      <td>61.974110</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>471</td>
+      <td>349</td>
+      <td>122</td>
+      <td>74.097665</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>381</td>
+      <td>279</td>
+      <td>102</td>
+      <td>73.228346</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>423</td>
+      <td>347</td>
+      <td>76</td>
+      <td>82.033097</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>468</td>
+      <td>398</td>
+      <td>70</td>
+      <td>85.042735</td>
+      <td>0.5</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>429</td>
+      <td>403</td>
+      <td>26</td>
+      <td>93.939394</td>
+      <td>0.5</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Brier Decomposition By Bucket</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts</th>
+      <th>brier_score</th>
+      <th>reliability</th>
+      <th>resolution</th>
+      <th>uncertainty</th>
+      <th>brier_from_decomposition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>66</td>
+      <td>0.239204</td>
+      <td>0.047855</td>
+      <td>0.040184</td>
+      <td>0.231405</td>
+      <td>0.239076</td>
+    </tr>
+    <tr>
+      <td>Minute 30</td>
+      <td>39</td>
+      <td>0.195939</td>
+      <td>0.043400</td>
+      <td>0.096702</td>
+      <td>0.249836</td>
+      <td>0.196534</td>
+    </tr>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>618</td>
+      <td>0.225815</td>
+      <td>0.031387</td>
+      <td>0.041512</td>
+      <td>0.238938</td>
+      <td>0.228812</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>471</td>
+      <td>0.188300</td>
+      <td>0.023243</td>
+      <td>0.078362</td>
+      <td>0.247511</td>
+      <td>0.192392</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>381</td>
+      <td>0.181701</td>
+      <td>0.027175</td>
+      <td>0.088534</td>
+      <td>0.244404</td>
+      <td>0.183046</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>423</td>
+      <td>0.143118</td>
+      <td>0.031586</td>
+      <td>0.135550</td>
+      <td>0.248478</td>
+      <td>0.144514</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>468</td>
+      <td>0.120368</td>
+      <td>0.013900</td>
+      <td>0.142527</td>
+      <td>0.249836</td>
+      <td>0.121209</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>429</td>
+      <td>0.054235</td>
+      <td>0.010442</td>
+      <td>0.204793</td>
+      <td>0.249401</td>
+      <td>0.055050</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Calibration Curves</h2>
+  <div class='chart-grid'>
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minute 1">
+      <text x="58" y="22" class="chart-title">Minute 1</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="215.1,180.7 256.8,120.4 296.3,62.7" class="series" />
+      <circle cx='215.1' cy='180.7' r='4'><title>p=0.357, freq=0.333</title></circle>
+<circle cx='256.8' cy='120.4' r='4'><title>p=0.452, freq=0.607</title></circle>
+<circle cx='296.3' cy='62.7' r='4'><title>p=0.542, freq=0.870</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minute 30">
+      <text x="58" y="22" class="chart-title">Minute 30</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="88.2,254.0 127.3,254.0 164.7,199.0 208.5,89.0 251.4,131.8 295.4,89.0 342.9,34.0 366.6,34.0" class="series" />
+      <circle cx='88.2' cy='254.0' r='4'><title>p=0.069, freq=0.000</title></circle>
+<circle cx='127.3' cy='254.0' r='4'><title>p=0.157, freq=0.000</title></circle>
+<circle cx='164.7' cy='199.0' r='4'><title>p=0.242, freq=0.250</title></circle>
+<circle cx='208.5' cy='89.0' r='4'><title>p=0.342, freq=0.750</title></circle>
+<circle cx='251.4' cy='131.8' r='4'><title>p=0.440, freq=0.556</title></circle>
+<circle cx='295.4' cy='89.0' r='4'><title>p=0.540, freq=0.750</title></circle>
+<circle cx='342.9' cy='34.0' r='4'><title>p=0.647, freq=1.000</title></circle>
+<circle cx='366.6' cy='34.0' r='4'><title>p=0.701, freq=1.000</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minutes 1-10">
+      <text x="58" y="22" class="chart-title">Minutes 1-10</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="130.8,254.0 171.6,202.2 213.7,157.4 257.1,121.0 295.4,75.9 340.4,68.4 383.2,34.0 425.7,34.0 479.4,34.0" class="series" />
+      <circle cx='130.8' cy='254.0' r='4'><title>p=0.165, freq=0.000</title></circle>
+<circle cx='171.6' cy='202.2' r='4'><title>p=0.258, freq=0.235</title></circle>
+<circle cx='213.7' cy='157.4' r='4'><title>p=0.354, freq=0.439</title></circle>
+<circle cx='257.1' cy='121.0' r='4'><title>p=0.453, freq=0.605</title></circle>
+<circle cx='295.4' cy='75.9' r='4'><title>p=0.540, freq=0.810</title></circle>
+<circle cx='340.4' cy='68.4' r='4'><title>p=0.642, freq=0.844</title></circle>
+<circle cx='383.2' cy='34.0' r='4'><title>p=0.739, freq=1.000</title></circle>
+<circle cx='425.7' cy='34.0' r='4'><title>p=0.836, freq=1.000</title></circle>
+<circle cx='479.4' cy='34.0' r='4'><title>p=0.958, freq=1.000</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minutes 11-20">
+      <text x="58" y="22" class="chart-title">Minutes 11-20</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="129.9,234.9 165.0,227.9 211.6,178.7 256.9,145.0 297.3,78.9 343.4,67.2 381.1,55.5 425.4,34.0 482.1,34.0" class="series" />
+      <circle cx='129.9' cy='234.9' r='4'><title>p=0.163, freq=0.087</title></circle>
+<circle cx='165.0' cy='227.9' r='4'><title>p=0.243, freq=0.119</title></circle>
+<circle cx='211.6' cy='178.7' r='4'><title>p=0.349, freq=0.342</title></circle>
+<circle cx='256.9' cy='145.0' r='4'><title>p=0.452, freq=0.496</title></circle>
+<circle cx='297.3' cy='78.9' r='4'><title>p=0.544, freq=0.796</title></circle>
+<circle cx='343.4' cy='67.2' r='4'><title>p=0.649, freq=0.849</title></circle>
+<circle cx='381.1' cy='55.5' r='4'><title>p=0.734, freq=0.902</title></circle>
+<circle cx='425.4' cy='34.0' r='4'><title>p=0.835, freq=1.000</title></circle>
+<circle cx='482.1' cy='34.0' r='4'><title>p=0.964, freq=1.000</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minutes 21-30">
+      <text x="58" y="22" class="chart-title">Minutes 21-30</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="94.0,254.0 126.4,233.5 161.6,208.3 210.0,159.0 255.2,112.6 297.2,74.7 345.2,51.8 383.2,69.2 425.9,67.0 471.4,34.0" class="series" />
+      <circle cx='94.0' cy='254.0' r='4'><title>p=0.082, freq=0.000</title></circle>
+<circle cx='126.4' cy='233.5' r='4'><title>p=0.155, freq=0.093</title></circle>
+<circle cx='161.6' cy='208.3' r='4'><title>p=0.236, freq=0.208</title></circle>
+<circle cx='210.0' cy='159.0' r='4'><title>p=0.345, freq=0.432</title></circle>
+<circle cx='255.2' cy='112.6' r='4'><title>p=0.448, freq=0.643</title></circle>
+<circle cx='297.2' cy='74.7' r='4'><title>p=0.544, freq=0.815</title></circle>
+<circle cx='345.2' cy='51.8' r='4'><title>p=0.653, freq=0.919</title></circle>
+<circle cx='383.2' cy='69.2' r='4'><title>p=0.739, freq=0.840</title></circle>
+<circle cx='425.9' cy='67.0' r='4'><title>p=0.836, freq=0.850</title></circle>
+<circle cx='471.4' cy='34.0' r='4'><title>p=0.939, freq=1.000</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minutes 31-40">
+      <text x="58" y="22" class="chart-title">Minutes 31-40</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="90.6,254.0 125.7,249.4 165.9,206.6 214.6,209.1 261.5,127.3 301.4,59.9 348.1,51.8 381.9,52.0 428.3,34.0 474.1,34.0" class="series" />
+      <circle cx='90.6' cy='254.0' r='4'><title>p=0.074, freq=0.000</title></circle>
+<circle cx='125.7' cy='249.4' r='4'><title>p=0.154, freq=0.021</title></circle>
+<circle cx='165.9' cy='206.6' r='4'><title>p=0.245, freq=0.215</title></circle>
+<circle cx='214.6' cy='209.1' r='4'><title>p=0.356, freq=0.204</title></circle>
+<circle cx='261.5' cy='127.3' r='4'><title>p=0.463, freq=0.576</title></circle>
+<circle cx='301.4' cy='59.9' r='4'><title>p=0.553, freq=0.882</title></circle>
+<circle cx='348.1' cy='51.8' r='4'><title>p=0.659, freq=0.919</title></circle>
+<circle cx='381.9' cy='52.0' r='4'><title>p=0.736, freq=0.918</title></circle>
+<circle cx='428.3' cy='34.0' r='4'><title>p=0.842, freq=1.000</title></circle>
+<circle cx='474.1' cy='34.0' r='4'><title>p=0.946, freq=1.000</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minutes 41-50">
+      <text x="58" y="22" class="chart-title">Minutes 41-50</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="79.6,254.0 121.8,226.1 168.0,214.4 207.5,186.8 257.5,157.8 298.8,99.4 347.9,72.8 387.8,34.0 434.9,38.3 477.1,47.3" class="series" />
+      <circle cx='79.6' cy='254.0' r='4'><title>p=0.049, freq=0.000</title></circle>
+<circle cx='121.8' cy='226.1' r='4'><title>p=0.145, freq=0.127</title></circle>
+<circle cx='168.0' cy='214.4' r='4'><title>p=0.250, freq=0.180</title></circle>
+<circle cx='207.5' cy='186.8' r='4'><title>p=0.340, freq=0.306</title></circle>
+<circle cx='257.5' cy='157.8' r='4'><title>p=0.453, freq=0.438</title></circle>
+<circle cx='298.8' cy='99.4' r='4'><title>p=0.547, freq=0.703</title></circle>
+<circle cx='347.9' cy='72.8' r='4'><title>p=0.659, freq=0.824</title></circle>
+<circle cx='387.8' cy='34.0' r='4'><title>p=0.750, freq=1.000</title></circle>
+<circle cx='434.9' cy='38.3' r='4'><title>p=0.857, freq=0.980</title></circle>
+<circle cx='477.1' cy='47.3' r='4'><title>p=0.952, freq=0.939</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    
+    <svg class="chart" viewBox="0 0 520 300" role="img" aria-label="Minutes 51-60">
+      <text x="58" y="22" class="chart-title">Minutes 51-60</text>
+      <line x1="58" y1="254" x2="498" y2="254" class="axis" />
+      <line x1="58" y1="34" x2="58" y2="254" class="axis" />
+      <polyline points="58.0,254.0 498.0,34.0" class="diag" />
+      <polyline points="67.6,254.0 119.2,240.2 165.2,205.1 208.7,210.0 261.0,151.3 301.1,86.8 347.0,34.0 387.2,41.9 436.2,34.0 492.0,34.0" class="series" />
+      <circle cx='67.6' cy='254.0' r='4'><title>p=0.022, freq=0.000</title></circle>
+<circle cx='119.2' cy='240.2' r='4'><title>p=0.139, freq=0.062</title></circle>
+<circle cx='165.2' cy='205.1' r='4'><title>p=0.244, freq=0.222</title></circle>
+<circle cx='208.7' cy='210.0' r='4'><title>p=0.343, freq=0.200</title></circle>
+<circle cx='261.0' cy='151.3' r='4'><title>p=0.461, freq=0.467</title></circle>
+<circle cx='301.1' cy='86.8' r='4'><title>p=0.553, freq=0.760</title></circle>
+<circle cx='347.0' cy='34.0' r='4'><title>p=0.657, freq=1.000</title></circle>
+<circle cx='387.2' cy='41.9' r='4'><title>p=0.748, freq=0.964</title></circle>
+<circle cx='436.2' cy='34.0' r='4'><title>p=0.860, freq=1.000</title></circle>
+<circle cx='492.0' cy='34.0' r='4'><title>p=0.986, freq=1.000</title></circle>
+      <text x="58" y="288" class="axis-label">Mean Model M probability</text>
+      <text x="12" y="46" class="axis-label">Observed</text>
+      <text x="34" y="258" class="tick">0</text>
+      <text x="490" y="272" class="tick">1</text>
+      <text x="26" y="38" class="tick">1</text>
+    </svg>
+    </div>
+
+  <h2>Output Files</h2>
+  <p class="note">
+    Detailed bucket data is saved in <code>time_bucket_metrics.csv</code>,
+    <code>time_bucket_accuracy.csv</code>, <code>time_bucket_brier_decomposition.csv</code>, and
+    <code>time_bucket_calibration_curve.csv</code>.
+  </p>
+</main>
+</body>
+</html>

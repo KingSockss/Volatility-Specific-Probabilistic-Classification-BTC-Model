@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model B Shock Breakout PnL</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07131d;
+      --panel: #10202d;
+      --panel-2: #142736;
+      --line: #22394b;
+      --ink: #e8f1fa;
+      --muted: #96aabd;
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #0b1823 0%, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 34px 24px 54px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 18px;
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .hero, .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      padding: 20px;
+    }
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a9c7e2;
+    }
+    .lead {
+      max-width: 940px;
+      margin: 14px 0 0;
+      font-size: 15px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 15px 16px;
+      background: var(--panel-2);
+    }
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .metric-card strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1.05;
+    }
+    .chart-wrap {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #0d1b26;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.01);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 10px 11px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+    }
+    code {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Standalone Breakout Experiment</p>
+    <h1>Model B Shock PnL When q_shock > 0.20</h1>
+    <p class="lead">
+      This is isolated from the main Model N outputs. It trades only rows where
+      <code>q_shock &gt; 0.20</code>, uses <code>p_shock</code> as the Model B shock
+      fair value, and prices entries at Model K. BUY_YES and BUY_NO both use a selected-side edge
+      threshold of <code>0.0</code>.
+    </p>
+    <div class="cards"><section class='metric-card'><span>Total PnL</span><strong>+3.040</strong></section><section class='metric-card'><span>Eligible Rows</span><strong>470</strong></section><section class='metric-card'><span>Signal Rows</span><strong>470</strong></section><section class='metric-card'><span>ROI</span><strong>0.0201</strong></section><section class='metric-card'><span>Winrate</span><strong>0.3277</strong></section><section class='metric-card'><span>Max Drawdown</span><strong>10.075</strong></section></div>
+  </section>
+
+  <h2>PnL Charts</h2>
+  <section class="chart-wrap"><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="89732b15-8e71-4572-a4e5-408187eb89e8" class="plotly-graph-div" style="height:700px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("89732b15-8e71-4572-a4e5-408187eb89e8")) {                    Plotly.newPlot(                        "89732b15-8e71-4572-a4e5-408187eb89e8",                        [{"line":{"color":"#ff8f70","width":3},"mode":"lines","name":"Cumulative PnL","x":["2026-04-07T13:48:00.000000","2026-04-07T14:11:00.000000","2026-04-07T14:19:00.000000","2026-04-07T14:20:00.000000","2026-04-08T04:17:00.000000","2026-04-08T07:43:00.000000","2026-04-08T12:06:00.000000","2026-04-08T14:48:00.000000","2026-04-08T14:53:00.000000","2026-04-08T17:12:00.000000","2026-04-08T19:01:00.000000","2026-04-09T00:46:00.000000","2026-04-09T00:47:00.000000","2026-04-09T03:08:00.000000","2026-04-09T03:51:00.000000","2026-04-09T11:21:00.000000","2026-04-09T13:06:00.000000","2026-04-09T13:45:00.000000","2026-04-09T13:48:00.000000","2026-04-09T13:49:00.000000","2026-04-09T13:51:00.000000","2026-04-09T13:52:00.000000","2026-04-09T13:53:00.000000","2026-04-09T13:56:00.000000","2026-04-09T13:57:00.000000","2026-04-09T14:01:00.000000","2026-04-09T14:02:00.000000","2026-04-09T14:11:00.000000","2026-04-09T14:28:00.000000","2026-04-09T14:55:00.000000","2026-04-09T15:11:00.000000","2026-04-10T01:37:00.000000","2026-04-10T02:51:00.000000","2026-04-10T04:51:00.000000","2026-04-10T07:45:00.000000","2026-04-10T07:59:00.000000","2026-04-10T08:51:00.000000","2026-04-10T10:42:00.000000","2026-04-10T10:50:00.000000","2026-04-10T16:59:00.000000","2026-04-10T20:05:00.000000","2026-04-10T22:01:00.000000","2026-04-11T03:55:00.000000","2026-04-11T06:00:00.000000","2026-04-11T06:39:00.000000","2026-04-11T07:15:00.000000","2026-04-11T07:19:00.000000","2026-04-11T07:54:00.000000","2026-04-11T08:09:00.000000","2026-04-11T08:25:00.000000","2026-04-11T08:40:00.000000","2026-04-11T08:54:00.000000","2026-04-11T12:01:00.000000","2026-04-11T12:03:00.000000","2026-04-11T12:07:00.000000","2026-04-11T14:52:00.000000","2026-04-11T14:55:00.000000","2026-04-12T01:15:00.000000","2026-04-12T01:49:00.000000","2026-04-12T01:50:00.000000","2026-04-12T03:29:00.000000","2026-04-12T03:42:00.000000","2026-04-12T03:43:00.000000","2026-04-12T04:00:00.000000","2026-04-12T04:01:00.000000","2026-04-12T04:13:00.000000","2026-04-12T04:19:00.000000","2026-04-12T05:02:00.000000","2026-04-12T07:39:00.000000","2026-04-12T07:40:00.000000","2026-04-12T07:44:00.000000","2026-04-12T08:04:00.000000","2026-04-12T08:09:00.000000","2026-04-12T08:15:00.000000","2026-04-12T08:54:00.000000","2026-04-12T09:06:00.000000","2026-04-12T09:14:00.000000","2026-04-12T10:01:00.000000","2026-04-12T11:01:00.000000","2026-04-12T11:10:00.000000","2026-04-12T11:11:00.000000","2026-04-12T12:06:00.000000","2026-04-12T14:55:00.000000","2026-04-12T19:38:00.000000","2026-04-12T19:39:00.000000","2026-04-12T20:19:00.000000","2026-04-13T00:06:00.000000","2026-04-13T02:45:00.000000","2026-04-13T04:55:00.000000","2026-04-13T07:27:00.000000","2026-04-13T08:41:00.000000","2026-04-13T11:37:00.000000","2026-04-14T18:40:00.000000","2026-04-14T18:55:00.000000","2026-04-14T21:40:00.000000","2026-04-14T21:45:00.000000","2026-04-14T22:30:00.000000","2026-04-15T02:27:00.000000","2026-04-15T02:36:00.000000","2026-04-15T07:02:00.000000","2026-04-15T07:17:00.000000","2026-04-15T10:28:00.000000","2026-04-15T13:03:00.000000","2026-04-15T13:45:00.000000","2026-04-15T14:25:00.000000","2026-04-15T19:09:00.000000","2026-04-16T09:22:00.000000","2026-04-16T11:49:00.000000","2026-04-16T13:23:00.000000","2026-04-16T23:22:00.000000","2026-04-16T23:28:00.000000","2026-04-17T05:08:00.000000","2026-04-17T07:55:00.000000","2026-04-17T08:01:00.000000","2026-04-17T08:29:00.000000","2026-04-17T11:53:00.000000","2026-04-17T12:01:00.000000","2026-04-17T12:12:00.000000","2026-04-17T12:19:00.000000","2026-04-17T14:01:00.000000","2026-04-17T18:56:00.000000","2026-04-18T06:26:00.000000","2026-04-18T07:08:00.000000","2026-04-18T07:25:00.000000","2026-04-18T07:31:00.000000","2026-04-18T07:33:00.000000","2026-04-18T07:38:00.000000","2026-04-18T07:39:00.000000","2026-04-18T07:50:00.000000","2026-04-18T07:51:00.000000","2026-04-18T13:35:00.000000","2026-04-18T13:50:00.000000","2026-04-19T12:16:00.000000","2026-04-19T13:09:00.000000","2026-04-19T14:47:00.000000","2026-04-19T15:23:00.000000","2026-04-20T03:48:00.000000","2026-04-20T03:49:00.000000","2026-04-20T07:37:00.000000","2026-04-20T12:19:00.000000","2026-04-20T13:53:00.000000","2026-04-20T14:42:00.000000","2026-04-20T15:27:00.000000","2026-04-20T20:28:00.000000","2026-04-20T20:42:00.000000","2026-04-20T20:44:00.000000","2026-04-21T07:42:00.000000","2026-04-21T15:04:00.000000","2026-04-21T16:44:00.000000","2026-04-22T02:30:00.000000","2026-04-22T02:31:00.000000","2026-04-22T02:54:00.000000","2026-04-22T07:10:00.000000","2026-04-22T07:11:00.000000","2026-04-22T07:27:00.000000","2026-04-22T07:47:00.000000","2026-04-22T07:51:00.000000"],"y":{"dtype":"f8","bdata":"H4XrUbge3b\u002fsehSuR+G6v6RwPQrXo8C\u002faGZmZmZm3j9I4XoUrkfBP+RRuB6F67E\u002fCFK4HoXrob+oHoXrUbiuP5xwPQrXo7A\u002fhutRuB6F57\u002fsUbgehesCwEjhehSuRwPApHA9CtejA8CkcD0K16MDwHA9CtejcP+\u002fmZmZmZmZ\u002fb8oXI\u002fC9Sj4v4TrUbgehfm\u002fUbgehetR+r9wPQrXo3D7v61H4XoUrvu\u002fwfUoXI\u002fC+7+sR+F6FK77v249CtejcPu\u002fMDMzMzMz+78gFK5H4Xqkv7RH4XoUruc\u002fiOtRuB6F+T\u002fZo3A9CtcEQON6FK5H4QRAPwrXo3A9AkDG9Shcj8L\u002fP+N6FK5H4QBAsUfhehSu9z\u002fG9Shcj8L7PxiuR+F6FPw\u002fFq5H4XoUAkDE9Shcj8IFQPcoXI\u002fC9QpAFq5H4XoUC0B8FK5H4XoIQFO4HoXrUQhA4noUrkfhBECQwvUoXI8GQBWuR+F6FApA4noUrkfhC0AfhetRuB4NQMP1KFyPwgtAFa5H4XoUBkC5HoXrUbgIQK9H4XoUrgVAhutRuB6FA0Bej8L1KFz7P+V6FK5H4e4\u002f5HoUrkfh8D8Q16NwPQrrP7RH4XoUruc\u002fvB6F61G4\u002fD\u002f6KFyPwvX8PzgzMzMzM\u002f0\u002fODMzMzMz\u002fz\u002fao3A9CtcBQEvhehSuRwRAxPUoXI\u002fCEUA\u002fCtejcL0VQLBH4XoULhlASuF6FK5HHED4KFyPwnUXQEAK16NwPRVAiOtRuB4FE0C7HoXrUbgTQNDMzMzMTBBAIoXrUbieEEA3MzMzMzMRQKhwPQrXoxBAVrgehevREECJ61G4HoURQLwehetRuBVABAAAAACAEUCTwvUoXA8SQJPC9ShcjxJA+Shcj8L1EkC8HoXrUbgUQBiuR+F6lBJAQQrXo3C9EkCCFK5H4XoMQBLXo3A9CgtArHA9CtejDUBvZmZmZmYLQAkAAAAAAApAKIXrUbgeDEB6PQrXo3APQCOF61G4HhBALVyPwvUoEECocD0K1yMVQPooXI\u002fC9RRAvR6F61E4FEBXuB6F69EUQPFRuB6FaxRAQwrXo3C9G0AkhetRuB4ZQNyjcD0KVxxADdejcD3KIEAXrkfhehQhQJLC9ShcTyJA+Chcj8I1IUACAAAAAIAkQLoehetROCRAAgAAAABAKUA1MzMzM\u002fMnQLoehetRuCZAsEfhehTuJkCcmZmZmZknQLBH4XoULidA7VG4HoWrJEAqXI\u002fC9agkQDQzMzMzcyFAaGZmZmbmHkAM16NwPYobQLBH4XoULhpANTMzMzMzGkDtUbgehesYQPcoXI\u002fCdRlAU7gehetRGkAqXI\u002fC9agbQHwUrkfh+hxA9yhcj8L1GkDE9Shcj0IZQAEAAAAAgBZA9yhcj8L1GUDE9Shcj0IWQLoehetRuBZAPwrXo3A9F0BoZmZmZuYUQO1RuB6FaxRAsEfhehQuGkBUuB6F69EZQJHC9ShcjxlAPwrXo3A9GkBoZmZmZmYYQH0Urkfh+hRAksL1KFyPG0BpZmZmZuYaQLFH4XoUrhhAp3A9CtcjF0CdmZmZmZkVQCxcj8L1KBVABgAAAAAADkCL61G4HoUPQIEUrkfheg9ATuF6FK5HD0BtZmZmZmYPQLRH4XoUrgZAbGZmZmZmBEDxUbgehesEQE3hehSuRwdAV7gehetRCEA="},"type":"scatter","xaxis":"x","yaxis":"y"},{"marker":{"color":"#6cb6ff"},"name":"Period PnL","opacity":0.55,"x":["2026-04-07T13:48:00.000000","2026-04-07T14:11:00.000000","2026-04-07T14:19:00.000000","2026-04-07T14:20:00.000000","2026-04-08T04:17:00.000000","2026-04-08T07:43:00.000000","2026-04-08T12:06:00.000000","2026-04-08T14:48:00.000000","2026-04-08T14:53:00.000000","2026-04-08T17:12:00.000000","2026-04-08T19:01:00.000000","2026-04-09T00:46:00.000000","2026-04-09T00:47:00.000000","2026-04-09T03:08:00.000000","2026-04-09T03:51:00.000000","2026-04-09T11:21:00.000000","2026-04-09T13:06:00.000000","2026-04-09T13:45:00.000000","2026-04-09T13:48:00.000000","2026-04-09T13:49:00.000000","2026-04-09T13:51:00.000000","2026-04-09T13:52:00.000000","2026-04-09T13:53:00.000000","2026-04-09T13:56:00.000000","2026-04-09T13:57:00.000000","2026-04-09T14:01:00.000000","2026-04-09T14:02:00.000000","2026-04-09T14:11:00.000000","2026-04-09T14:28:00.000000","2026-04-09T14:55:00.000000","2026-04-09T15:11:00.000000","2026-04-10T01:37:00.000000","2026-04-10T02:51:00.000000","2026-04-10T04:51:00.000000","2026-04-10T07:45:00.000000","2026-04-10T07:59:00.000000","2026-04-10T08:51:00.000000","2026-04-10T10:42:00.000000","2026-04-10T10:50:00.000000","2026-04-10T16:59:00.000000","2026-04-10T20:05:00.000000","2026-04-10T22:01:00.000000","2026-04-11T03:55:00.000000","2026-04-11T06:00:00.000000","2026-04-11T06:39:00.000000","2026-04-11T07:15:00.000000","2026-04-11T07:19:00.000000","2026-04-11T07:54:00.000000","2026-04-11T08:09:00.000000","2026-04-11T08:25:00.000000","2026-04-11T08:40:00.000000","2026-04-11T08:54:00.000000","2026-04-11T12:01:00.000000","2026-04-11T12:03:00.000000","2026-04-11T12:07:00.000000","2026-04-11T14:52:00.000000","2026-04-11T14:55:00.000000","2026-04-12T01:15:00.000000","2026-04-12T01:49:00.000000","2026-04-12T01:50:00.000000","2026-04-12T03:29:00.000000","2026-04-12T03:42:00.000000","2026-04-12T03:43:00.000000","2026-04-12T04:00:00.000000","2026-04-12T04:01:00.000000","2026-04-12T04:13:00.000000","2026-04-12T04:19:00.000000","2026-04-12T05:02:00.000000","2026-04-12T07:39:00.000000","2026-04-12T07:40:00.000000","2026-04-12T07:44:00.000000","2026-04-12T08:04:00.000000","2026-04-12T08:09:00.000000","2026-04-12T08:15:00.000000","2026-04-12T08:54:00.000000","2026-04-12T09:06:00.000000","2026-04-12T09:14:00.000000","2026-04-12T10:01:00.000000","2026-04-12T11:01:00.000000","2026-04-12T11:10:00.000000","2026-04-12T11:11:00.000000","2026-04-12T12:06:00.000000","2026-04-12T14:55:00.000000","2026-04-12T19:38:00.000000","2026-04-12T19:39:00.000000","2026-04-12T20:19:00.000000","2026-04-13T00:06:00.000000","2026-04-13T02:45:00.000000","2026-04-13T04:55:00.000000","2026-04-13T07:27:00.000000","2026-04-13T08:41:00.000000","2026-04-13T11:37:00.000000","2026-04-14T18:40:00.000000","2026-04-14T18:55:00.000000","2026-04-14T21:40:00.000000","2026-04-14T21:45:00.000000","2026-04-14T22:30:00.000000","2026-04-15T02:27:00.000000","2026-04-15T02:36:00.000000","2026-04-15T07:02:00.000000","2026-04-15T07:17:00.000000","2026-04-15T10:28:00.000000","2026-04-15T13:03:00.000000","2026-04-15T13:45:00.000000","2026-04-15T14:25:00.000000","2026-04-15T19:09:00.000000","2026-04-16T09:22:00.000000","2026-04-16T11:49:00.000000","2026-04-16T13:23:00.000000","2026-04-16T23:22:00.000000","2026-04-16T23:28:00.000000","2026-04-17T05:08:00.000000","2026-04-17T07:55:00.000000","2026-04-17T08:01:00.000000","2026-04-17T08:29:00.000000","2026-04-17T11:53:00.000000","2026-04-17T12:01:00.000000","2026-04-17T12:12:00.000000","2026-04-17T12:19:00.000000","2026-04-17T14:01:00.000000","2026-04-17T18:56:00.000000","2026-04-18T06:26:00.000000","2026-04-18T07:08:00.000000","2026-04-18T07:25:00.000000","2026-04-18T07:31:00.000000","2026-04-18T07:33:00.000000","2026-04-18T07:38:00.000000","2026-04-18T07:39:00.000000","2026-04-18T07:50:00.000000","2026-04-18T07:51:00.000000","2026-04-18T13:35:00.000000","2026-04-18T13:50:00.000000","2026-04-19T12:16:00.000000","2026-04-19T13:09:00.000000","2026-04-19T14:47:00.000000","2026-04-19T15:23:00.000000","2026-04-20T03:48:00.000000","2026-04-20T03:49:00.000000","2026-04-20T07:37:00.000000","2026-04-20T12:19:00.000000","2026-04-20T13:53:00.000000","2026-04-20T14:42:00.000000","2026-04-20T15:27:00.000000","2026-04-20T20:28:00.000000","2026-04-20T20:42:00.000000","2026-04-20T20:44:00.000000","2026-04-21T07:42:00.000000","2026-04-21T15:04:00.000000","2026-04-21T16:44:00.000000","2026-04-22T02:30:00.000000","2026-04-22T02:31:00.000000","2026-04-22T02:54:00.000000","2026-04-22T07:10:00.000000","2026-04-22T07:11:00.000000","2026-04-22T07:27:00.000000","2026-04-22T07:47:00.000000","2026-04-22T07:51:00.000000"],"y":{"dtype":"f8","bdata":"H4XrUbge3b9kZmZmZmbWP3CZmZmZmZm\u002fXY\u002fC9Shc4z\u002fE9Shcj8LVv6xwPQrXo7C\u002f6HoUrkfhur9YuB6F61G4P4UUrkfhenQ\u002fmpmZmZmZ6b8VrkfhehT6vwvXo3A9Cqe\u002fC9ejcD0Kp78AAAAAAAAAAF6PwvUoXN8\u002fcD0K16NwvT\u002fD9Shcj8LVP8P1KFyPwrW\u002fmpmZmZmZqb\u002fsUbgeheuxv7YehetRuI6\u002fdhSuR+F6dL+FFK5H4Xp0P8AehetRuI4\u002fwB6F61G4jj+PwvUoXI\u002f6P\u002fYoXI\u002fC9eg\u002fXI\u002fC9Shc6z8qXI\u002fC9SjwP4AUrkfhenQ\u002fHoXrUbge1b\u002fiehSuR+HSvwEAAAAAAMA\u002fKlyPwvUo5L9SuB6F61HQP4AUrkfhepQ\u002fKVyPwvUo4D9wPQrXo3DdP8zMzMzMzOQ\u002fwB6F61G4jj\u002fOzMzMzMzUv4AUrkfhepS\u002fhOtRuB6F27\u002fgehSuR+HKPyZcj8L1KNw\u002fz8zMzMzMzD\u002fVo3A9CtfDP8P1KFyPwsW\u002fuB6F61G45r8ehetRuB7VP1K4HoXrUdi\u002fSOF6FK5H0b9cj8L1KFznv9ejcD0K1+e\u002fENejcD0Ktz\u002fiehSuR+HKv+R6FK5H4bq\u002f4noUrkfh8D\u002fAHoXrUbiOP8AehetRuI4\u002fAAAAAAAAwD\u002fsUbgehevRP4brUbgehdM\u002fexSuR+F6\u002fj\u002fXo3A9CtfvP4TrUbgehes\u002fzczMzMzM6D9I4XoUrkfzv8P1KFyPwuG\u002fxPUoXI\u002fC4b9gZmZmZmbGP1uPwvUoXOu\u002ffhSuR+F6tD+VwvUoXI\u002fCP+pRuB6F68G\u002fCNejcD0Kpz9kZmZmZmbGP83MzMzMzPA\u002f4noUrkfh8L\u002fqUbgehevBP\u002fz\u002f\u002f\u002f\u002f\u002f\u002f78\u002fmJmZmZmZuT8oXI\u002fC9SjcPx6F61G4HuG\u002fcBSuR+F6pD8AAAAAAADyvwjXo3A9Cse\u002fzMzMzMzM1D\u002frUbgehevRv2ZmZmZmZsa\u002f9Chcj8L10D+QwvUoXI\u002faP5OZmZmZmbk\u002fgBSuR+F6hD\u002fsUbgehevzPxDXo3A9Cqe\u002fqkfhehSux780MzMzMzPDP5qZmZmZmbm\u002fSOF6FK5H\u002fT\u002f2KFyPwvXkv8H1KFyPwuk\u002f9ihcj8L19D+TwvUoXI\u002fCP69H4XoUruM\u002fmpmZmZmZ4b9SuB6F61H6P+xRuB6F68G\u002fH4XrUbgeBEDMzMzMzMzkv65H4XoUruO\u002f7HoUrkfhuj9wPQrXo3DVP+B6FK5H4cq\u002fFa5H4XoU9L+AFK5H4Xp0v65H4XoUrvm\u002f\u002f\u002f\u002f\u002f\u002f\u002f\u002f\u002f77\u002fiehSuR+Hqv8L1KFyPwtW\u002fhRSuR+F6dD98FK5H4XrUv0fhehSuR8E\u002fhOtRuB6Fyz9wPQrXo3DVPyCF61G4HtU\u002fKVyPwvUo4L80MzMzMzPbvxauR+F6FOa\u002frkfhehSu6z+ZmZmZmZntv3A9CtejcL0\u002fpHA9CtejwD+5HoXrUbjiv7gehetRuL6\u002fCtejcD0K9z8I16NwPQq3v6hwPQrXo7C\u002fwPUoXI\u002fCxT9wPQrXo3Ddv1uPwvUoXOu\u002fUrgehetR+j8ghetRuB7Fv8P1KFyPwuG\u002fpXA9Ctej2L+jcD0K16PYvzBcj8L1KLy\u002fpHA9Ctej+L9UuB6F61HIP4AUrkfhenS\u002foJmZmZmZmb\u002fAHoXrUbiOP3E9CtejcPG\u002fPgrXo3A90r+gcD0K16OwP+B6FK5H4dI\u002foHA9CtejwD8="},"type":"bar","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"matches":"x2","showticklabels":false,"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis":{"anchor":"x","domain":[0.55,1.0],"title":{"text":"Cumulative PnL"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"xaxis2":{"anchor":"y2","domain":[0.0,1.0],"title":{"text":"Forecast timestamp"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis2":{"anchor":"x2","domain":[0.0,0.45],"title":{"text":"Period PnL"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Cumulative Realized PnL","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Period PnL","x":0.5,"xanchor":"center","xref":"paper","y":0.45,"yanchor":"bottom","yref":"paper"}],"font":{"color":"#e8f1fa"},"legend":{"orientation":"h","x":0,"y":1.14,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":96,"b":44},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":700},                        {"responsive": true}                    )                };            </script>        </div><div>                            <div id="b512fc6f-615d-4552-bed1-03ddb5a358cd" class="plotly-graph-div" style="height:430px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("b512fc6f-615d-4552-bed1-03ddb5a358cd")) {                    Plotly.newPlot(                        "b512fc6f-615d-4552-bed1-03ddb5a358cd",                        [{"marker":{"color":"#35c7b7"},"x":["BUY_NO","BUY_YES"],"y":{"dtype":"i2","bdata":"LAGqAA=="},"type":"bar","xaxis":"x","yaxis":"y"},{"marker":{"color":"#fbbf24"},"x":["ATM","OTM+1","OTM-1"],"y":{"dtype":"f8","bdata":"ksL1KFyPDMApXI\u002fC9agVQB2F61G4HvM\u002f"},"type":"bar","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.44],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Trades"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"xaxis2":{"anchor":"y2","domain":[0.56,1.0],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Total PnL"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Trade Direction Counts","x":0.22,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"PnL By Contract Label","x":0.78,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"}],"font":{"color":"#e8f1fa"},"legend":{"orientation":"h","x":0,"y":1.14,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":96,"b":44},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":430},                        {"responsive": true}                    )                };            </script>        </div></section>
+
+  <h2>Summary</h2>
+  <section class="panel"><div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>shock_threshold</th>
+      <th>threshold_slug</th>
+      <th>segment</th>
+      <th>overlap_rows</th>
+      <th>overlap_timestamps</th>
+      <th>eligible_rows_q_gt_threshold</th>
+      <th>eligible_timestamps_q_gt_threshold</th>
+      <th>signal_rows</th>
+      <th>signal_timestamps</th>
+      <th>eligible_row_trade_rate</th>
+      <th>eligible_timestamp_trade_rate</th>
+      <th>full_overlap_row_trade_rate</th>
+      <th>full_overlap_timestamp_trade_rate</th>
+      <th>winrate</th>
+      <th>average_q_shock</th>
+      <th>average_selected_side_probability</th>
+      <th>average_model_k_selected_side_price</th>
+      <th>average_edge</th>
+      <th>total_expected_value</th>
+      <th>average_realized_pnl</th>
+      <th>total_realized_pnl</th>
+      <th>total_cost</th>
+      <th>roi_on_cost</th>
+      <th>best_period_pnl</th>
+      <th>worst_period_pnl</th>
+      <th>max_drawdown</th>
+      <th>final_cumulative_pnl</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0.2000</td>
+      <td>q_gt_0_20</td>
+      <td>overall</td>
+      <td>44,176</td>
+      <td>14,828</td>
+      <td>470</td>
+      <td>157</td>
+      <td>470</td>
+      <td>157</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>0.0106</td>
+      <td>0.0106</td>
+      <td>0.3277</td>
+      <td>0.2457</td>
+      <td>0.4284</td>
+      <td>0.3212</td>
+      <td>0.1072</td>
+      <td>50.3826</td>
+      <td>+0.0065</td>
+      <td>+3.0400</td>
+      <td>150.9600</td>
+      <td>0.0201</td>
+      <td>+2.5150</td>
+      <td>-1.6300</td>
+      <td>10.0750</td>
+      <td>+3.0400</td>
+    </tr>
+    <tr>
+      <td>0.2000</td>
+      <td>q_gt_0_20</td>
+      <td>trade_side=BUY_NO</td>
+      <td>44,176</td>
+      <td>14,828</td>
+      <td>470</td>
+      <td>157</td>
+      <td>300</td>
+      <td>143</td>
+      <td>0.6383</td>
+      <td>0.9108</td>
+      <td>0.0068</td>
+      <td>0.0096</td>
+      <td>0.3767</td>
+      <td>0.2457</td>
+      <td>0.5143</td>
+      <td>0.3784</td>
+      <td>0.1359</td>
+      <td>40.7725</td>
+      <td>-0.0018</td>
+      <td>-0.5300</td>
+      <td>113.5300</td>
+      <td>-0.0047</td>
+      <td>+2.5150</td>
+      <td>-1.6300</td>
+      <td>10.5850</td>
+      <td>-0.5300</td>
+    </tr>
+    <tr>
+      <td>0.2000</td>
+      <td>q_gt_0_20</td>
+      <td>trade_side=BUY_YES</td>
+      <td>44,176</td>
+      <td>14,828</td>
+      <td>470</td>
+      <td>157</td>
+      <td>170</td>
+      <td>105</td>
+      <td>0.3617</td>
+      <td>0.6688</td>
+      <td>0.0038</td>
+      <td>0.0071</td>
+      <td>0.2412</td>
+      <td>0.2459</td>
+      <td>0.2767</td>
+      <td>0.2202</td>
+      <td>0.0565</td>
+      <td>9.6100</td>
+      <td>+0.0210</td>
+      <td>+3.5700</td>
+      <td>37.4300</td>
+      <td>0.0954</td>
+      <td>+1.6850</td>
+      <td>-0.7250</td>
+      <td>6.2400</td>
+      <td>+3.5700</td>
+    </tr>
+    <tr>
+      <td>0.2000</td>
+      <td>q_gt_0_20</td>
+      <td>contract_label=ATM</td>
+      <td>14,764</td>
+      <td>14,764</td>
+      <td>157</td>
+      <td>157</td>
+      <td>157</td>
+      <td>157</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>0.0106</td>
+      <td>0.0106</td>
+      <td>0.3121</td>
+      <td>0.2456</td>
+      <td>0.4394</td>
+      <td>0.3348</td>
+      <td>0.1046</td>
+      <td>16.4165</td>
+      <td>-0.0227</td>
+      <td>-3.5700</td>
+      <td>52.5700</td>
+      <td>-0.0679</td>
+      <td>+0.9300</td>
+      <td>-0.6550</td>
+      <td>4.6350</td>
+      <td>-3.5700</td>
+    </tr>
+    <tr>
+      <td>0.2000</td>
+      <td>q_gt_0_20</td>
+      <td>contract_label=OTM+1</td>
+      <td>14,714</td>
+      <td>14,714</td>
+      <td>156</td>
+      <td>156</td>
+      <td>156</td>
+      <td>156</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>0.0106</td>
+      <td>0.0106</td>
+      <td>0.3654</td>
+      <td>0.2459</td>
+      <td>0.4011</td>
+      <td>0.3307</td>
+      <td>0.0704</td>
+      <td>10.9822</td>
+      <td>+0.0347</td>
+      <td>+5.4150</td>
+      <td>51.5850</td>
+      <td>0.1050</td>
+      <td>+0.9050</td>
+      <td>-0.7850</td>
+      <td>4.6050</td>
+      <td>+5.4150</td>
+    </tr>
+    <tr>
+      <td>0.2000</td>
+      <td>q_gt_0_20</td>
+      <td>contract_label=OTM-1</td>
+      <td>14,698</td>
+      <td>14,698</td>
+      <td>157</td>
+      <td>157</td>
+      <td>157</td>
+      <td>157</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>0.0107</td>
+      <td>0.0107</td>
+      <td>0.3057</td>
+      <td>0.2456</td>
+      <td>0.4445</td>
+      <td>0.2981</td>
+      <td>0.1464</td>
+      <td>22.9839</td>
+      <td>+0.0076</td>
+      <td>+1.1950</td>
+      <td>46.8050</td>
+      <td>0.0255</td>
+      <td>+0.9150</td>
+      <td>-0.7550</td>
+      <td>5.0400</td>
+      <td>+1.1950</td>
+    </tr>
+  </tbody>
+</table></div></section>
+
+  <h2>Output Files</h2>
+  <section class="panel">
+    <p>
+      Outputs in this folder: <code>breakout_shock_trade_minutes.csv</code>,
+      <code>breakout_shock_pnl_timeseries.csv</code>, <code>breakout_shock_profitability_summary.csv</code>,
+      and <code>filtered_overlap_rows.csv</code>.
+    </p>
+  </section>
+</main>
+</body>
+</html>

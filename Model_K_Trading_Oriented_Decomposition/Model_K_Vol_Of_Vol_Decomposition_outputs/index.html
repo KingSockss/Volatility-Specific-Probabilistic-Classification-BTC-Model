@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model K Lagged Vol-of-Vol Decomposition</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071018;
+      --panel: #0d1722;
+      --panel-2: #122130;
+      --ink: #e6eef8;
+      --muted: #9db0c3;
+      --line: #223548;
+      --soft: #102030;
+      --blue: #6cb6ff;
+      --teal: #4fd1c5;
+      --amber: #f6ad55;
+      --link: #8cc8ff;
+    }
+    html {
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top, rgba(76, 132, 196, 0.18), transparent 32%),
+        linear-gradient(180deg, #08111a 0%, #071018 100%);
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    h2 {
+      margin: 34px 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    a {
+      color: var(--link);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .metric-card strong {
+      display: block;
+      font-size: 24px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .chart {
+      width: 100%;
+      min-height: 280px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+    }
+    .chart-title {
+      font-size: 16px;
+      font-weight: 650;
+      fill: var(--ink);
+    }
+    .axis {
+      stroke: #35516c;
+      stroke-width: 1;
+    }
+    .diag {
+      fill: none;
+      stroke: #6682a0;
+      stroke-width: 1.5;
+      stroke-dasharray: 5 5;
+    }
+    .series {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 3;
+    }
+    circle {
+      fill: var(--blue);
+    }
+    rect {
+      fill: var(--teal);
+    }
+    .axis-label, .tick {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .data-table th, .data-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+    }
+    .data-table td {
+      color: var(--ink);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    code {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Model K Lagged Vol-of-Vol Decomposition</h1>
+  <p>
+    This directory contains five segment-specific copies of the usual Model K outputs, split by
+    minute-level BTC vol-of-vol measured from Binance 1-minute candles and classified with a
+    lagged trailing 72-hour real-time window.
+  </p>
+
+  <h2>Real-Time Vol-of-Vol Definition</h2>
+  <p>
+    Minute volatility is <code>abs(log(close/open))</code> for each Binance 1-minute candle.
+    For forecast minute <code>t</code>, vol-of-vol is the standard deviation of minute volatility
+    over the prior <code>4320</code> minutes ending at <code>t-1</code>, then assigned
+    to <code>t</code>. Classification uses the rolling percentile cutoffs of that lagged vol-of-vol
+    series, so no target-minute Binance return is used.
+  </p>
+
+  <h2>Threshold Summaries</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>threshold_name</th>
+      <th>percentile</th>
+      <th>window_hours</th>
+      <th>window_minutes</th>
+      <th>latest_lagged_vol_of_vol_cutoff</th>
+      <th>min_lagged_vol_of_vol_cutoff</th>
+      <th>median_lagged_vol_of_vol_cutoff</th>
+      <th>max_lagged_vol_of_vol_cutoff</th>
+      <th>rule</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Low Vol-of-Vol Extreme</td>
+      <td>0.10</td>
+      <td>72</td>
+      <td>4320</td>
+      <td>0.000392</td>
+      <td>0.000255</td>
+      <td>0.000424</td>
+      <td>0.000666</td>
+      <td>lagged_vol_of_vol &lt;= trailing_72h_q10</td>
+    </tr>
+    <tr>
+      <td>Low Vol-of-Vol</td>
+      <td>0.25</td>
+      <td>72</td>
+      <td>4320</td>
+      <td>0.000407</td>
+      <td>0.000284</td>
+      <td>0.000444</td>
+      <td>0.000671</td>
+      <td>lagged_vol_of_vol &lt;= trailing_72h_q25</td>
+    </tr>
+    <tr>
+      <td>High Vol-of-Vol</td>
+      <td>0.75</td>
+      <td>72</td>
+      <td>4320</td>
+      <td>0.000424</td>
+      <td>0.000349</td>
+      <td>0.000483</td>
+      <td>0.000697</td>
+      <td>lagged_vol_of_vol &gt;= trailing_72h_q75</td>
+    </tr>
+    <tr>
+      <td>High Vol-of-Vol Extreme</td>
+      <td>0.90</td>
+      <td>72</td>
+      <td>4320</td>
+      <td>0.000426</td>
+      <td>0.000357</td>
+      <td>0.000494</td>
+      <td>0.000703</td>
+      <td>lagged_vol_of_vol &gt;= trailing_72h_q90</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Segment Output Folders</h2>
+  <ul>
+    <li><strong>Low Vol-of-Vol</strong>: <a href='Low Vol-of-Vol/model_k_summary.html'>summary</a>, <a href='Low Vol-of-Vol/model_k_summary_with_coverage.html'>summary with coverage</a>, <a href='Low Vol-of-Vol/time_bucket_summary.html'>time bucket summary</a></li><li><strong>Standard Vol-of-Vol</strong>: <a href='Standard Vol-of-Vol/model_k_summary.html'>summary</a>, <a href='Standard Vol-of-Vol/model_k_summary_with_coverage.html'>summary with coverage</a>, <a href='Standard Vol-of-Vol/time_bucket_summary.html'>time bucket summary</a></li><li><strong>High Vol-of-Vol</strong>: <a href='High Vol-of-Vol/model_k_summary.html'>summary</a>, <a href='High Vol-of-Vol/model_k_summary_with_coverage.html'>summary with coverage</a>, <a href='High Vol-of-Vol/time_bucket_summary.html'>time bucket summary</a></li><li><strong>Low Vol-of-Vol Extreme</strong>: <a href='Low Vol-of-Vol Extreme/model_k_summary.html'>summary</a>, <a href='Low Vol-of-Vol Extreme/model_k_summary_with_coverage.html'>summary with coverage</a>, <a href='Low Vol-of-Vol Extreme/time_bucket_summary.html'>time bucket summary</a></li><li><strong>High Vol-of-Vol Extreme</strong>: <a href='High Vol-of-Vol Extreme/model_k_summary.html'>summary</a>, <a href='High Vol-of-Vol Extreme/model_k_summary_with_coverage.html'>summary with coverage</a>, <a href='High Vol-of-Vol Extreme/time_bucket_summary.html'>time bucket summary</a></li>
+  </ul>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment_name</th>
+      <th>segment_rule</th>
+      <th>n_forecast_minutes</th>
+      <th>n_forecasts</th>
+      <th>n_event_contracts</th>
+      <th>brier_score</th>
+      <th>log_loss</th>
+      <th>model_k_summary_html</th>
+      <th>model_k_summary_with_coverage_html</th>
+      <th>time_bucket_summary_html</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Low Vol-of-Vol</td>
+      <td>Lagged minute-level vol-of-vol at or below the trailing 72-hour rolling 25th percentile.</td>
+      <td>30603</td>
+      <td>91071</td>
+      <td>1611</td>
+      <td>0.120309</td>
+      <td>0.371361</td>
+      <td>Low Vol-of-Vol/model_k_summary.html</td>
+      <td>Low Vol-of-Vol/model_k_summary_with_coverage.html</td>
+      <td>Low Vol-of-Vol/time_bucket_summary.html</td>
+    </tr>
+    <tr>
+      <td>Standard Vol-of-Vol</td>
+      <td>Lagged minute-level vol-of-vol strictly between the trailing 72-hour rolling 25th and 75th percentiles.</td>
+      <td>18991</td>
+      <td>56575</td>
+      <td>1106</td>
+      <td>0.135594</td>
+      <td>0.411810</td>
+      <td>Standard Vol-of-Vol/model_k_summary.html</td>
+      <td>Standard Vol-of-Vol/model_k_summary_with_coverage.html</td>
+      <td>Standard Vol-of-Vol/time_bucket_summary.html</td>
+    </tr>
+    <tr>
+      <td>High Vol-of-Vol</td>
+      <td>Lagged minute-level vol-of-vol at or above the trailing 72-hour rolling 75th percentile.</td>
+      <td>22099</td>
+      <td>65978</td>
+      <td>1176</td>
+      <td>0.128284</td>
+      <td>0.392056</td>
+      <td>High Vol-of-Vol/model_k_summary.html</td>
+      <td>High Vol-of-Vol/model_k_summary_with_coverage.html</td>
+      <td>High Vol-of-Vol/time_bucket_summary.html</td>
+    </tr>
+    <tr>
+      <td>Low Vol-of-Vol Extreme</td>
+      <td>Lagged minute-level vol-of-vol at or below the trailing 72-hour rolling 10th percentile.</td>
+      <td>21138</td>
+      <td>62863</td>
+      <td>1139</td>
+      <td>0.115179</td>
+      <td>0.358252</td>
+      <td>Low Vol-of-Vol Extreme/model_k_summary.html</td>
+      <td>Low Vol-of-Vol Extreme/model_k_summary_with_coverage.html</td>
+      <td>Low Vol-of-Vol Extreme/time_bucket_summary.html</td>
+    </tr>
+    <tr>
+      <td>High Vol-of-Vol Extreme</td>
+      <td>Lagged minute-level vol-of-vol at or above the trailing 72-hour rolling 90th percentile.</td>
+      <td>13078</td>
+      <td>39083</td>
+      <td>738</td>
+      <td>0.131005</td>
+      <td>0.397694</td>
+      <td>High Vol-of-Vol Extreme/model_k_summary.html</td>
+      <td>High Vol-of-Vol Extreme/model_k_summary_with_coverage.html</td>
+      <td>High Vol-of-Vol Extreme/time_bucket_summary.html</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Shared Root Files</h2>
+  <ul>
+    <li><code>binance_1m_klines.csv</code>: cached Binance minute data used for the decomposition.</li>
+    <li><code>binance_minute_vol_of_vol.csv</code>: minute volatility, lagged vol-of-vol, and rolling real-time thresholds.</li>
+    <li><code>minute_market_vol_of_vol_segments.csv</code>: each scored Kalshi forecast minute with lagged vol-of-vol, rolling thresholds, and segment flags.</li>
+    <li><code>segment_thresholds.csv</code>: summary statistics for the rolling percentile cutoffs used in this run.</li>
+    <li><code>all_scored_rows_with_vol_of_vol.csv</code>: scored Model K rows with attached minute-level vol-of-vol metadata.</li>
+    <li><code>excluded_*_insufficient_vol_of_vol_history.csv</code>: rows dropped only when <code>--drop-insufficient-history</code> is used with a partial local cache.</li>
+    <li><code>kalshi_official_outcomes_long.csv</code>: official contract outcomes used for all segment runs.</li>
+  </ul>
+</main>
+</body>
+</html>

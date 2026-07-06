@@ -1,0 +1,10 @@
+Model N forecast values are interpreted as YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.
+Model N uses p_final = (1 - q_shock) * p_normal + q_shock * p_shock.
+Model N also carries p_exponential_hybrid with lambda=2 as a downstream strategy probability: w(q) = (exp(2*q) - 1) / (exp(2) - 1), p_exp = (1 - w(q)) * p_normal + w(q) * p_shock.
+p_normal is Model R, which was verified to match Model A's architecture except for the 20,000 Monte Carlo path default.
+p_shock is the full Model H fair-value source used by Model M before Model M's hard gate selection.
+q_shock is the continuous y_prob value from the cloned Model M Additional_Data/all_test_predictions.csv, filtered to scenario=drop_stale and model=logistic_regression by default.
+Scored event outcome is the official Kalshi contract result: 1 for YES resolved, 0 for NO resolved.
+Forecast rows are joined to outcomes by exact Kalshi market ticker when available; legacy price files without market tickers fall back to event_ticker + contract_label + strike.
+Event tickers are interpreted as the contract settlement/end hour, matching the price fetcher's hour_end_utc -> New York event ticker convention.
+Binance prices are diagnostic only. They may be used for strike matching upstream and audit mismatch checks, but never as the scored truth label.

@@ -1,0 +1,3016 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model M RT vs Model K RT: Low Volatility</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07131d;
+      --bg-2: #0b1823;
+      --panel: #10202d;
+      --panel-2: #142736;
+      --line: #22394b;
+      --line-soft: rgba(255,255,255,0.05);
+      --ink: #e8f1fa;
+      --muted: #96aabd;
+      --model-g: #6cb6ff;
+      --model-g-rt: #ff8f70;
+      --model-k: #4fd1c5;
+      --pill: #122736;
+    }
+    html {
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(108, 182, 255, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(255, 143, 112, 0.15), transparent 28%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 34px 24px 54px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      margin: 36px 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--ink);
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    a {
+      color: #9aceff;
+    }
+    .hero {
+      padding: 24px 24px 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        var(--panel);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 16px 40px rgba(0,0,0,0.18);
+    }
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a9c7e2;
+    }
+    .lead {
+      max-width: 920px;
+      margin: 14px 0 0;
+      font-size: 15px;
+    }
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--pill);
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .swatch.total {
+      background: var(--model-g);
+    }
+    .swatch.vol {
+      background: var(--model-g-rt);
+    }
+    .swatch.k {
+      background: var(--model-k);
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01)),
+        var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      padding: 20px 20px 18px;
+    }
+    .note-card {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .note-card p {
+      margin: 0;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.01);
+    }
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 10px 11px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+      position: sticky;
+      top: 0;
+    }
+    .data-table td {
+      color: var(--ink);
+    }
+    .section-stack {
+      display: grid;
+      gap: 18px;
+    }
+    .chart-wrap {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .chart-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .links {
+      display: grid;
+      gap: 8px;
+      padding-left: 18px;
+    }
+    code {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Cross-Model Volatility Dashboard</p>
+    <h1>Model M RT vs Model K RT: Low Volatility</h1>
+    <p class="lead">This page compares <code>Model_M_Volatility_Decomposition_RT.py</code> against <code>Model_K_Volatility_Decomposition_RT.py</code> on the exact overlapping scored-row universe inside <code>Low Volatility</code>. The volatility slice is defined as: Hourly realized volatility at or below the trailing 72-hour rolling 25th percentile.</p>
+    <div class="hero-pills"><span class='pill'><span class='swatch vol'></span>Low Volatility hourly markets: 70</span><span class='pill'>Overlap scored rows: 945</span><span class='pill'>Overlap event contracts: 209</span><span class='pill'>Overlap match rate: 1.0000 vs 1.0000</span></div>
+  </section>
+
+  <h2>Topline Comparison</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>metric</th>
+      <th>focus</th>
+      <th>benchmark</th>
+      <th>delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Scored rows</td>
+      <td>945</td>
+      <td>945</td>
+      <td>+0</td>
+    </tr>
+    <tr>
+      <td>Event contracts</td>
+      <td>209</td>
+      <td>209</td>
+      <td>+0</td>
+    </tr>
+    <tr>
+      <td>Brier score</td>
+      <td>0.1601</td>
+      <td>0.1351</td>
+      <td>+0.0250</td>
+    </tr>
+    <tr>
+      <td>Log loss</td>
+      <td>0.4888</td>
+      <td>0.4112</td>
+      <td>+0.0776</td>
+    </tr>
+    <tr>
+      <td>ECE</td>
+      <td>0.1327</td>
+      <td>0.0457</td>
+      <td>+0.0870</td>
+    </tr>
+  </tbody>
+</table></div>
+    <p class="chart-note">All comparison metrics on this page are computed on the exact overlapping scored-row universe, so the Model M and Model K values are directly comparable inside the same volatility slice.</p>
+  </section>
+
+  <h2>Chart Comparison</h2>
+  <section class="section-stack">
+    <div class="chart-wrap"><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="081a8eb8-2ea9-4b89-a8f1-eb414b0a48a0" class="plotly-graph-div" style="height:430px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("081a8eb8-2ea9-4b89-a8f1-eb414b0a48a0")) {                    Plotly.newPlot(                        "081a8eb8-2ea9-4b89-a8f1-eb414b0a48a0",                        [{"line":{"color":"#8ea3b7","dash":"dash"},"mode":"lines","name":"Perfect calibration","x":[0,1],"y":[0,1],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#4fd1c5","width":3},"marker":{"color":"#4fd1c5","size":8},"mode":"lines+markers","name":"Model K RT: Low Volatility","x":{"dtype":"f8","bdata":"jOkCjSf\u002fpD\u002fP8YieocbCPzqFdIG5AdA\u002fvsRF2x6q1j9ZKOhT8R\u002fdP5XS3LNXyOE\u002fj59EnVH+5D9VGnLuswvoP8\u002fzPM\u002fzPOs\u002fB2zABmzA7j8="},"y":{"dtype":"f8","bdata":"oCyBTfvJkj8fclkxUMK7PyivobyG8so\u002foNMGOm2g0z96oHJ2C7\u002faP9nY2NjY2Ng\u002fw6\u002fGRHqg4j+3bdu2bdvmP3zFV3zFV+w\u002f7\u002fEe7\u002fEe7z8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#ff8f70","width":3},"marker":{"color":"#ff8f70","size":8},"mode":"lines+markers","name":"Model M RT: Low Volatility","x":{"dtype":"f8","bdata":"vX2Y293HpT\u002fysDgpDG\u002fDP0KBWasuCdA\u002fVx72J15o1j9gg6fcA7PcP2m8lTg1V+E\u002fgnhWAoMc5T\u002f2qFaQKqTnP5AIpwNCHus\u002fDlO8l5YP7z8="},"y":{"dtype":"f8","bdata":"AAAAAAAAAAA72rxPccmQPwAAAAAAALw\u002f+0xb4+\u002fm0T8dzuEczuHcP0aLVz4Rs+k\u002fDeU1lNdQ7j9nt\u002fCrMZHuPwAAAAAAAPA\u002fAAAAAAAA8D8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"marker":{"color":"#4fd1c5"},"name":"Model K RT: Low Volatility","opacity":0.6,"x":{"dtype":"f8","bdata":"HYXrUbge1T+\u002f9Shcj8LFP8L1KFyPwuE\u002fPgrXo3A96j\u002fB9Shcj8LVP7gehetRuO4\u002fcT0K16Nw1T\u002f2KFyPwvXIP\u002fYoXI\u002fC9eA\u002fpHA9Ctej0D9I4XoUrkfBPylcj8L1KNw\u002fXI\u002fC9Shczz\u002fhehSuR+G6P8H1KFyPwt0\u002fAAAAAAAAwD+4HoXrUbiOP7gehetRuOI\u002fZmZmZmZmxj+4HoXrUbiePz4K16NwPeY\u002fPQrXo3A90j8AAAAAAADAP5qZmZmZmeE\u002fpHA9CtejsD97FK5H4Xp0P+xRuB6F69k\u002fexSuR+F6dD97FK5H4Xp0P5qZmZmZmZk\u002fUrgehetR2D\u002fhehSuR+HKPwrXo3A9CuM\u002fAAAAAAAA0D9I4XoUrkfBPx2F61G4Ht0\u002fbT0K16NwzT97FK5H4XqkPzMzMzMzM+c\u002fyczMzMzMzD8K16NwPQq3P4XrUbgehds\u002fzczMzMzM1D+PwvUoXI\u002fCP7gehetRuOI\u002fzczMzMzMzD\u002fhehSuR+G6P7gehetRuN4\u002fj8L1KFyPwj+amZmZmZmpP+F6FK5H4dI\u002fzczMzMzMzD8zMzMzMzOzPx2F61G4Ht0\u002fPQrXo3A9yj+4HoXrUbiuP+xRuB6F6+E\u002fSOF6FK5HwT\u002fsUbgeheuxP8H1KFyPwt0\u002fKVyPwvUovD+4HoXrUbiuP1yPwvUoXNc\u002fmpmZmZmZmT97FK5H4Xp0P7v1KFyPwrU\u002f7FG4HoXroT97FK5H4Xp0Px+F61G4HsU\u002fKVyPwvUo3D+amZmZmZnRP1K4HoXrUeQ\u002fcT0K16Nw1T+PwvUoXI\u002fCP\u002fYoXI\u002fC9eQ\u002frkfhehSu3z8fhetRuB7VP4\u002fC9Shcj+Y\u002fXI\u002fC9Shc1z89CtejcD3KPz4K16NwPeI\u002fuB6F61G41j\u002f2KFyPwvXIPz4K16NwPeI\u002f4XoUrkfh2j89CtejcD3KPx+F61G4HuU\u002fwfUoXI\u002fC1T\u002fsUbgehevBP1yPwvUoXOM\u002f4XoUrkfh0j8pXI\u002fC9Si8P8P1KFyPwuE\u002fSOF6FK5H0T9SuB6F61G4P2ZmZmZmZuI\u002fKVyPwvUovD\u002fsUbgeheuhP5qZmZmZmdk\u002fmpmZmZmZmT97FK5H4Xp0P3sUrkfhesQ\u002fexSuR+F6dD97FK5H4Xp0Pylcj8L1KKw\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfhenQ\u002fexSuR+F6dD97FK5H4Xp0P3sUrkfheoQ\u002f16NwPQrX6z9mZmZmZmbmP2ZmZmZmZu4\u002fMzMzMzMz6z9I4XoUrkflPxSuR+F6FO4\u002fmpmZmZmZ7T+amZmZmZnpP+F6FK5H4e4\u002fCtejcD0K1z9SuB6F61HIPzMzMzMzM+M\u002fw\u002fUoXI\u002fC4T\u002fhehSuR+HSPx+F61G4Huk\u002fFK5H4XoU4j\u002fhehSuR+HSP8P1KFyPwuk\u002f4XoUrkfh0j97FK5H4Xq0P6RwPQrXo+Q\u002f16NwPQrX0z+79Shcj8K1P5qZmZmZmeU\u002fzczMzMzM5D\u002fXo3A9CtfDP+F6FK5H4e4\u002fFK5H4XoU6j\u002fsUbgehevBPzMzMzMzM+8\u002f9ihcj8L17D\u002fhehSuR+HaP9ejcD0K1+8\u002fFK5H4XoU3j9SuB6F61HQP4\u002fC9Shcj+Y\u002fj8L1KFyP2j\u002fNzMzMzMzMP\u002fYoXI\u002fC9eQ\u002fw\u002fUoXI\u002fC4T8UrkfhehTWP3sUrkfheug\u002fFK5H4XoU1j+\u002f9Shcj8LFP3E9CtejcOE\u002fSOF6FK5H4T+F61G4HoXTP1K4HoXrUeg\u002f9ihcj8L10D\u002fhehSuR+G6P83MzMzMzOA\u002fH4XrUbgexT\u002fsUbgeheuhPylcj8L1KOA\u002fexSuR+F6dD97FK5H4Xp0P2k9CtejcL0\u002fUrgehetR2D9I4XoUrkfBP8L1KFyPwuU\u002fMzMzMzMz5z+uR+F6FK7XPz0K16NwPe4\u002fZmZmZmZm6j8fhetRuB7hP2ZmZmZmZu4\u002fZmZmZmZm6j\u002fNzMzMzMzgPz0K16NwPe4\u002fAAAAAAAA5D+PwvUoXI\u002fCPz0K16NwPe4\u002fFK5H4XoU4j+kcD0K16OwP4\u002fC9Shcj+4\u002fmpmZmZmZmT97FK5H4Xp0PzQzMzMzM+M\u002fuB6F61G41j\u002fXo3A9CtfDP3A9CtejcOU\u002fzczMzMzM1D\u002fhehSuR+G6Pylcj8L1KOQ\u002fXI\u002fC9Shc4z+79Shcj8K1Pz0K16NwPe4\u002fPQrXo3A95j9SuB6F61HYP6RwPQrXo+w\u002fCtejcD0K5z\u002fsUbgehevZP1K4HoXrUew\u002fwvUoXI\u002fC6T8fhetRuB7VP+F6FK5H4e4\u002fpHA9Ctej4D9tPQrXo3DNPxSuR+F6FOo\u002fj8L1KFyP4j9tPQrXo3DNPwAAAAAAAOw\u002fFK5H4XoU3j+PwvUoXI\u002fCP4\u002fC9Shcj+o\u002fpHA9Ctej6D9cj8L1KFzXP+xRuB6F6+0\u002fH4XrUbge5T+amZmZmZnRP5qZmZmZme0\u002f9ihcj8L15D8pXI\u002fC9SjMP5qZmZmZme0\u002fAAAAAAAA5D+PwvUoXI\u002fCPz0K16NwPe4\u002f4XoUrkfh0j\u002fsUbgeheuhP3sUrkfheuw\u002fPQrXo3A90j+amZmZmZmZPx+F61G4Hu0\u002fuB6F61G4nj97FK5H4Xp0P65H4XoUrus\u002fzczMzMzM6D\u002fhehSuR+HaP+xRuB6F6+0\u002fUrgehetR7D+4HoXrUbjeP+F6FK5H4e4\u002fwvUoXI\u002fC5T\u002fsUbgehevBPxSuR+F6FO4\u002fXI\u002fC9Shc6z\u002fhehSuR+HKPzMzMzMzM+8\u002fKVyPwvUo7D\u002f2KFyPwvXIPzMzMzMzM+8\u002fZmZmZmZm7j+amZmZmZnRP4XrUbgehe8\u002f16NwPQrX5z97FK5H4XqEP9ejcD0K1+8\u002fCtejcD0K4z8UrkfhehTOP65H4XoUrus\u002fuB6F61G44j\u002fNzMzMzMzMPwrXo3A9Cus\u002f7FG4HoXr4T+F61G4HoXLP1yPwvUoXOs\u002fcT0K16Nw4T\u002f2KFyPwvXIP1yPwvUoXOs\u002fMzMzMzMz2z+PwvUoXI\u002fCP83MzMzMzOg\u002fMzMzMzMz2z8AAAAAAADAP8L1KFyPwuk\u002fMzMzMzMzsz+4HoXrUbiOP+xRuB6F6+U\u002fCtejcD0Kpz+4HoXrUbiOPzMzMzMzM+M\u002fexSuR+F67D8pXI\u002fC9SjgPwrXo3A9Cu8\u002fMzMzMzMz6z+PwvUoXI\u002faPwrXo3A9Cu8\u002f7FG4HoXr7T+F61G4HoXTP4XrUbgehe8\u002fuB6F61G47j\u002f2KFyPwvXYP9ejcD0K1+8\u002fmpmZmZmZ5T8zMzMzMzPTP3sUrkfheuw\u002fmpmZmZmZ5T\u002fXo3A9CtfTP\u002fYoXI\u002fC9ew\u002fAAAAAAAA5D89CtejcD3SP1K4HoXrUew\u002fZmZmZmZm5j9cj8L1KFzXP3E9CtejcO0\u002fKVyPwvUo6D+PwvUoXI\u002faP3E9CtejcO0\u002fhetRuB6F4z9SuB6F61HQP4XrUbgehes\u002fNDMzMzMz5z8AAAAAAADYP3E9CtejcO0\u002fuB6F61G46j+F61G4HoXLPwrXo3A9Cu8\u002fZmZmZmZm5j8K16NwPQrXP3E9CtejcO0\u002fMzMzMzMz2z9SuB6F61G4P65H4XoUrus\u002fmpmZmZmZ0T8K16NwPQqnP\u002fYoXI\u002fC9eg\u002fH4XrUbge1T\u002fsUbgeheuhPzMzMzMzM+s\u002f16NwPQrX2z+amZmZmZmpP3E9CtejcO0\u002frkfhehSu6z\u002fsUbgeheuxP9ejcD0K1+8\u002fXI\u002fC9Shc6z+amZmZmZmpP9ejcD0K1+8\u002fj8L1KFyP7j8pXI\u002fC9SisP9ejcD0K1+8\u002fj8L1KFyP4j9cj8L1KFzPP1yPwvUoXOs\u002fSOF6FK5H2T8zMzMzMzPDP5qZmZmZmeU\u002fH4XrUbge1T+PwvUoXI\u002fCP1K4HoXrUeQ\u002f4XoUrkfh0j9xPQrXo3C9PzMzMzMzM+M\u002f4XoUrkfh0j+amZmZmZm5P7gehetRuOI\u002fCtejcD0K1z+kcD0K16OwP2ZmZmZmZuo\u002f4XoUrkfh5j8pXI\u002fC9SjMP2ZmZmZmZu4\u002fFK5H4XoU5j+uR+F6FK7HPxSuR+F6FO4\u002fAAAAAAAA7D8dhetRuB7VPwrXo3A9Cu8\u002fCtejcD0K6z9SuB6F61HQPzMzMzMzM+8\u002fKVyPwvUo7D89CtejcD3SPzMzMzMzM+8\u002fmpmZmZmZ7T8AAAAAAADAP9ejcD0K1+8\u002f4XoUrkfh7j\u002fhehSuR+G6P9ejcD0K1+8\u002fhetRuB6F7z97FK5H4XqUP9ejcD0K1+8\u002fMzMzMzMz2z\u002fJzMzMzMzMP3E9CtejcOk\u002frkfhehSu3z\u002fhehSuR+HKP3E9CtejcOk\u002fj8L1KFyP2j+kcD0K16PAP+F6FK5H4eY\u002frkfhehSu3z+\u002f9Shcj8LFPz4K16NwPeo\u002f16NwPQrX6z\u002fNzMzMzMzUP65H4XoUru8\u002fMzMzMzMz5z8K16NwPQq3P+F6FK5H4e4\u002fpHA9Ctej2D+4HoXrUbieP+xRuB6F6+0\u002f9ihcj8L1yD97FK5H4XqUP+xRuB6F6+0\u002fuB6F61G4rj97FK5H4Xp0P5qZmZmZme0\u002fmpmZmZmZmT97FK5H4Xp0P7gehetRuO4\u002fexSuR+F6dD97FK5H4Xp0P+F6FK5H4e4\u002fXI\u002fC9Shc3z9SuB6F61HQP8P1KFyPwuk\u002fbz0K16Nw3T+uR+F6FK7HP6RwPQrXo+g\u002fuB6F61G43j9SuB6F61HIP3E9CtejcOk\u002fmpmZmZmZ4T+F61G4HoXLP4\u002fC9Shcj+o\u002fCtejcD0K4z\u002f2KFyPwvXQPwrXo3A9Cus\u002fXI\u002fC9Shc5z+PwvUoXI\u002fSP+xRuB6F6+0\u002fwvUoXI\u002fC6T9xPQrXo3DVPwrXo3A9Cu8\u002fAAAAAAAA7D\u002fsUbgehevRPzMzMzMzM+8\u002fPQrXo3A90j97FK5H4Xp0P4\u002fC9Shcj+4\u002fZmZmZmZm3j8AAAAAAADQP1yPwvUoXOc\u002fwfUoXI\u002fC3T\u002fJzMzMzMzMP4\u002fC9Shcj+Y\u002fSOF6FK5H4T+PwvUoXI\u002fSPwAAAAAAAOg\u002frkfhehSu3z8AAAAAAADQPylcj8L1KOg\u002fUrgehetR2D9SuB6F61HIP7gehetRuOY\u002f9ihcj8L12D\u002f2KFyPwvXIP7gehetRuOY\u002fFK5H4XoU5j8zMzMzMzPbPylcj8L1KOw\u002fzczMzMzM6D9SuB6F61HIP4XrUbgehe8\u002fAAAAAAAA5D9pPQrXo3C9P4\u002fC9Shcj+4\u002fFK5H4XoU6j8AAAAAAADQPzMzMzMzM+8\u002fj8L1KFyP5j8AAAAAAADAP4XrUbgehe8\u002fPQrXo3A95j8UrkfhehTeP4XrUbgehes\u002fXI\u002fC9Shc5z8K16NwPQrfPylcj8L1KOw\u002fexSuR+F67D+amZmZmZnlP+F6FK5H4e4\u002fexSuR+F67D\u002fsUbgehevlPwrXo3A9Cu8\u002fKVyPwvUo6D89CtejcD3SPz0K16NwPe4\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002fw\u002fUoXI\u002fC7T\u002fXo3A9CtfnPwrXo3A9Cu8\u002fZmZmZmZm7j8K16NwPQrrPzMzMzMzM+8\u002fPQrXo3A97j\u002fC9Shcj8LpPzMzMzMzM+8\u002f4XoUrkfh5j9I4XoUrkfRP8P1KFyPwu0\u002fZmZmZmZmxj\u002fsUbgeheuhP5qZmZmZmeU\u002fKVyPwvUo6D8zMzMzMzPbP0jhehSuR+0\u002fhetRuB6F7z9SuB6F61HsP65H4XoUru8\u002fAAAAAAAA0D9SuB6F61G4P8H1KFyPwt0\u002fmpmZmZmZ5T+4HoXrUbjWP1K4HoXrUew\u002f7FG4HoXr7T+amZmZmZnlPzMzMzMzM+8\u002fSOF6FK5H7T9SuB6F61HkPwrXo3A9Cu8\u002fMzMzMzMz7z+kcD0K16PsP65H4XoUru8\u002fPQrXo3A9yj9pPQrXo3C9PzMzMzMzM9s\u002fw\u002fUoXI\u002fC7T9xPQrXo3DpP+F6FK5H4e4\u002fcT0K16Nw6T\u002fXo3A9CtfjP0jhehSuR+0\u002f7FG4HoXr6T97FK5H4XrgP4\u002fC9Shcj+4\u002fPQrXo3A97j\u002fhehSuR+HiP4XrUbgehe8\u002fhetRuB6F7z\u002f2KFyPwvXkP9ejcD0K1+8\u002f4XoUrkfh7j8pXI\u002fC9SjsP9ejcD0K1+8\u002f16NwPQrX7z8zMzMzMzPvP9ejcD0K1+8\u002f16NwPQrX7z+F61G4HoXvP9ejcD0K1+8\u002f16NwPQrX7z+F61G4HoXvP9ejcD0K1+8\u002fuB6F61G46j9SuB6F61HkP8P1KFyPwu0\u002fw\u002fUoXI\u002fC4T8AAAAAAADYPylcj8L1KOg\u002f7FG4HoXr4T8UrkfhehTWPylcj8L1KOg\u002fAAAAAAAA7D8zMzMzMzPnP2ZmZmZmZu4\u002fH4XrUbge3T+amZmZmZnRP4\u002fC9Shcj+Y\u002fFK5H4XoUzj9SuB6F61G4P2ZmZmZmZuI\u002fhetRuB6Fyz+79Shcj8K1P+F6FK5H4eI\u002fhetRuB6Fyz8K16NwPQqnP1yPwvUoXOM\u002frkfhehSu5z\u002fNzMzMzMzgPwAAAAAAAOw\u002fKVyPwvUo6D8K16NwPQrXP8P1KFyPwu0\u002f16NwPQrX7z+F61G4HoXvP9ejcD0K1+8\u002fMzMzMzMz6z9I4XoUrkflPwAAAAAAAOw\u002fcT0K16Nw6T9I4XoUrkfZP5qZmZmZme0\u002fFK5H4XoU6j+kcD0K16PYP+xRuB6F6+0\u002f7FG4HoXr5T+4HoXrUbjWP\u002fYoXI\u002fC9ew\u002frkfhehSu6z+uR+F6FK7jP+F6FK5H4e4\u002fj8L1KFyP6j9mZmZmZmbiP4\u002fC9Shcj+4\u002fH4XrUbge6T8pXI\u002fC9SjgP+xRuB6F6+0\u002fKVyPwvUo6D9cj8L1KFzfP+xRuB6F6+0\u002fSOF6FK5H6T9mZmZmZmbePz0K16NwPe4\u002fZmZmZmZm3j8fhetRuB7FPz4K16NwPeo\u002fZmZmZmZm4j8UrkfhehTOP9ejcD0K1+s\u002f4XoUrkfh4j9SuB6F61HQP1K4HoXrUew\u002f16NwPQrX6z97FK5H4XrUPzMzMzMzM+8\u002fAAAAAAAA5D\u002fXo3A9CtfTP1yPwvUoXOs\u002fXI\u002fC9Shc4z89CtejcD3SP65H4XoUrus\u002fzczMzMzM4D\u002fNzMzMzMzMP7gehetRuOo\u002fH4XrUbge4T89CtejcD3KP7gehetRuOo\u002fj8L1KFyP4j8AAAAAAADQP4XrUbgehes\u002fKVyPwvUo4D9mZmZmZmbGPxSuR+F6FOo\u002fFK5H4XoU4j+uR+F6FK7HP1K4HoXrUew\u002fj8L1KFyP4j89CtejcD3KP1K4HoXrUew\u002fCtejcD0K3z9I4XoUrkfBP65H4XoUrus\u002fexSuR+F64D+PwvUoXI\u002fCPwAAAAAAAOw\u002fzczMzMzM4D9I4XoUrkfBP1K4HoXrUew\u002fFK5H4XoU4j\u002fXo3A9CtfDP\u002fYoXI\u002fC9ew\u002fFK5H4XoU4j+PwvUoXI\u002fCP\u002fYoXI\u002fC9ew\u002fFK5H4XoU4j9I4XoUrkfBP\u002fYoXI\u002fC9ew\u002fXI\u002fC9Shc3z9SuB6F61G4P1K4HoXrUew\u002fexSuR+F64D+amZmZmZm5P0jhehSuR+0\u002fzczMzMzM4D+79Shcj8K1P5qZmZmZme0\u002fCtejcD0K3z+kcD0K16OwP5qZmZmZme0\u002fexSuR+F63D8pXI\u002fC9SisP3E9CtejcO0\u002fXI\u002fC9Shc1z8K16NwPQqnP\u002fYoXI\u002fC9ew\u002fzczMzMzMzD+amZmZmZmZP2ZmZmZmZuo\u002fCtejcD0Kpz97FK5H4Xp0P65H4XoUrt8\u002fmpmZmZmZmT97FK5H4Xp0P8H1KFyPwtU\u002fexSuR+F6hD97FK5H4Xp0P7gehetRuL4\u002fexSuR+F6lD97FK5H4Xp0P2ZmZmZmZuo\u002f16NwPQrXwz+kcD0K16OwPwAAAAAAANg\u002fzczMzMzM4D8zMzMzMzPDP9ejcD0K1+s\u002fexSuR+F67D\u002f2KFyPwvXkPz0K16NwPe4\u002f16NwPQrX7z8zMzMzMzPvP9ejcD0K1+8\u002fZmZmZmZm7j9cj8L1KFzfP0jhehSuR9E\u002fhetRuB6F5z8K16NwPQrjPwrXo3A9Ctc\u002fw\u002fUoXI\u002fC6T8AAAAAAADsP2ZmZmZmZuY\u002fuB6F61G47j9cj8L1KFznP0jhehSuR9k\u002fmpmZmZmZ7T8+CtejcD3iP0jhehSuR9k\u002fAAAAAAAA6D8UrkfhehTiP0jhehSuR9k\u002frkfhehSu5z8UrkfhehTiP6RwPQrXo9g\u002fexSuR+F66D8K16NwPQrnP0jhehSuR+E\u002frkfhehSu6z+4HoXrUbjOPwAAAAAAAMA\u002fhetRuB6F2z9cj8L1KFzPP7gehetRuL4\u002fbz0K16Nw3T+F61G4HoXTPzMzMzMzM8M\u002f9ihcj8L14D9cj8L1KFzPPwAAAAAAAMA\u002fbz0K16Nw3T9cj8L1KFzPP2k9CtejcL0\u002fwfUoXI\u002fC3T8fhetRuB7dPylcj8L1KMw\u002fuB6F61G45j\u002fsUbgehevRP5qZmZmZmbk\u002fFK5H4XoU4j9cj8L1KFzPP7v1KFyPwrU\u002fwvUoXI\u002fC4T9mZmZmZmbqPwAAAAAAAOA\u002fCtejcD0K7z+4HoXrUbjmPxSuR+F6FNY\u002f7FG4HoXr7T8zMzMzMzPnP4XrUbgehdM\u002fuB6F61G47j\u002fC9Shcj8LpP2ZmZmZmZtY\u002fMzMzMzMz7z+amZmZmZnlP2ZmZmZmZsY\u002fuB6F61G47j9mZmZmZmbePwrXo3A9Crc\u002fcT0K16Nw7T+PwvUoXI\u002fiP5qZmZmZmbk\u002fuB6F61G47j\u002fXo3A9CtfvPylcj8L1KKw\u002frkfhehSu7z+4HoXrUbjeP9ejcD0K19M\u002f9ihcj8L15D+kcD0K16PkPzMzMzMzM9s\u002fFK5H4XoU6j97FK5H4XroPwAAAAAAAOQ\u002fw\u002fUoXI\u002fC7T8K16NwPQrrP5qZmZmZmeU\u002fPQrXo3A97j9xPQrXo3DtP+xRuB6F66E\u002f16NwPQrX7z\u002fhehSuR+HuP3sUrkfheoQ\u002f16NwPQrX7z\u002fXo3A9CtfjP4\u002fC9Shcj9o\u002fmpmZmZmZ6T9SuB6F61HgPzMzMzMzM9M\u002f4XoUrkfh5j9SuB6F61HkP1K4HoXrUdg\u002fH4XrUbge6T9mZmZmZmbiP7gehetRuNY\u002fKVyPwvUo6D9SuB6F61HgP4\u002fC9Shcj9I\u002fmpmZmZmZ5T9cj8L1KFzjPwrXo3A9Ctc\u002fw\u002fUoXI\u002fC6T9cj8L1KFzjP3E9CtejcNU\u002fw\u002fUoXI\u002fC6T+uR+F6FK7jP2ZmZmZmZtY\u002fmpmZmZmZ6T+uR+F6FK7nPx2F61G4Ht0\u002fFK5H4XoU6j9xPQrXo3DpP1K4HoXrUeA\u002fUrgehetR7D+F61G4HoXvP0jhehSuR+0\u002f16NwPQrX7z8zMzMzMzPDP5qZmZmZmZk\u002fCtejcD0K5z+amZmZmZntP4XrUbgehe8\u002fMzMzMzMz7z+F61G4HoXvP4XrUbgehe8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002f16NwPQrX7z\u002fXo3A9CtfvP9ejcD0K1+8\u002fuB6F61G44j+uR+F6FK7XP3sUrkfheug\u002fCtejcD0K4z9SuB6F61HYP3sUrkfheug\u002fzczMzMzM4D97FK5H4XrUPzMzMzMzM+c\u002fuB6F61G44j+kcD0K16PYP83MzMzMzOg\u002f16NwPQrXwz8pXI\u002fC9SisP2ZmZmZmZtY\u002fH4XrUbge6T\u002fsUbgehevhP6RwPQrXo+w\u002fZmZmZmZm6j+amZmZmZnlPz0K16NwPe4\u002fPQrXo3A97j\u002fNzMzMzMzoP1yPwvUoXO8\u002fyczMzMzMzD9xPQrXo3C9P3sUrkfhetw\u002fZmZmZmZm3j+PwvUoXI\u002fCP1yPwvUoXOs\u002fXI\u002fC9Shc6z+F61G4HoXbPzMzMzMzM+8\u002fH4XrUbge4T\u002fhehSuR+HSPzMzMzMzM+c\u002fuB6F61G44j9xPQrXo3DVPylcj8L1KOg\u002fexSuR+F64D89CtejcD3SPz0K16NwPeY\u002frkfhehSu3z89CtejcD3SP5qZmZmZmeU\u002f7FG4HoXr2T89CtejcD3KP5qZmZmZmeU\u002fSOF6FK5H2T\u002fhehSuR+HKP5qZmZmZmeU\u002fUrgehetR0D\u002fhehSuR+G6Px+F61G4HuE\u002fPQrXo3A9yj+79Shcj8K1P2ZmZmZmZt4\u002fj8L1KFyPwj+4HoXrUbiuP6RwPQrXo9g\u002fPQrXo3A9yj8zMzMzMzOzP3sUrkfheuA\u002f9ihcj8L10D\u002fsUbgeheuxP5qZmZmZmek\u002fpHA9Ctej0D+amZmZmZmpP+xRuB6F6+k\u002fPQrXo3A9yj+4HoXrUbiePx+F61G4Huk\u002fexSuR+F6xD97FK5H4XqUP8L1KFyPwuk\u002fv\u002fUoXI\u002fCxT97FK5H4XqUP2ZmZmZmZuo\u002fuB6F61G4vj97FK5H4Xp0P4\u002fC9Shcj+o\u002f"},"xbins":{"end":1.0,"size":0.05,"start":0.0},"type":"histogram","xaxis":"x2","yaxis":"y2"},{"marker":{"color":"#ff8f70"},"name":"Model M RT: Low Volatility","opacity":0.6,"x":{"dtype":"f8","bdata":"Ol0on9ZT2D+pNlqiHRTSP2PDQtOWP98\u002fSgGdIDg65D97RfaFCA7WP2uFWJUav+s\u002fNM4tCxWl2T9+9S\u002fbC8nPPzfzSB6IvNw\u002fT2yTMUlu1T\u002ffvi3mLVnLP081iSCj9Ns\u002fkV8pFZLD1D+G3eyoGrXKP\u002fSnK7gOC9w\u002fYNLcOolKxj82wBJ5uYC0P+mEIDjiCds\u002fmd11KRa2yj9ZeeLsTvq7PzLwV\u002f83S+A\u002foVcfI3Ay2D+UlASNTRbPP2ji\u002fmA4dNw\u002fVHiDwtyryT8UFY\u002fVxDC5P3Ii1KNGhts\u002f2S+GN322lT+H3IGM+M1tP4HHqpwkG8A\u002fQ069TcP42j8l8ebY6l7SP\u002fGLPKyerN8\u002f4be+2oDD1D9FGZ2+EHrLPyirF9x62Ns\u002fR5sfHSUO2D9lMhaKjDTFPxr+hPAs4+M\u002fvOBmz13z1j+SfJ6qxSzLP9eprKL0dNw\u002fxLSsy7U22D8vm51noF7NPyo66fDsndw\u002f9de5m31f1T\u002fJ6TsKDszIP818rcsvo9s\u002fjcBIlGbFxz8adYknOd+\u002fP1VVVVVVVdU\u002f3kd7OWp+yD\u002fGW8DT5znAPzDAfEatTtY\u002f9i9ucST6zT\u002fH+pdIcVDEP+TeX5h7sNs\u002fw3DjbL7H0z\u002fdV4CQH3bGP+hYmskKmNw\u002f91m1wbAqzT\u002fKhgJ\u002fDNXAP\u002fQOvF+z2ds\u002fafhV7g\u002fqtz+OyOCexMShP1dymbHtsM4\u002f\u002fImObOsztD84wE\u002f\u002fm1GhP52qzegoj8A\u002fduWJi0xl4D+ZeDI5CaXZP8p7K+sRvuE\u002ff+Z+y2Xz2j8RMmM+dOjNP7ObG58mw+E\u002fqTiNhWPb3D9IsW9W1fLTP5+ENEStBeE\u002f+KSL3kdd2T8trBOD7K3SP3EN409LiuA\u002f5DX30beq1z\u002fz\u002fpMypFnRP93zDSgfSuA\u002fyQppP6Hr2j9vilOIpzjTP7gs8rnhKOE\u002foSxAJoGG1z\u002fbCvzfTADPP00eKhC7luA\u002fXYDUHwZ11j9VkZ9zDPTLP0ENnPXya+A\u002fB\u002f+1fFSA1D9O5sqQPpDJP0raOADzCeA\u002frBbhLit3xz8iO2geJp65P1F9hJoSKNg\u002fBFpLlXbhuT\u002f4W3pYHpylP+RWRurhLs8\u002fyv4fq9ectj90mgrRhs+fPxnJ1gabAsw\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVXcddXLR5z+FrdbRqSrkPwRfJDonIOo\u002fPejw4EHI5z820ddPVsziP54cvrOrwek\u002fpH7M3r5v6D8foX9B84vmP6dw6gqLAuw\u002f2rb3Rt863z+NeqeWbujUP9Trf9MFXuE\u002fi238tNjG3z8m4zPX6v\u002fUP4YhmGv65OE\u002fAAAAAAAA4D8br8ihyjjVP6NmCw+AN+M\u002fb8oQv8Q\u002f2T9SbmfRpBHQP6YjBBXh\u002feA\u002f8cifRm8x1T\u002fJ7GEDt2HNP3YESeOF0eA\u002fVtEfC3mo4D8WvVYGeD\u002fRPy3tz2XkAOg\u002fG4SoL+9K4j+fhZWk0kfQP72Y40VhVes\u002fCtZH4yEY4z+VmN3N6xXQP1IoieiWm+s\u002fC7JyO2pK3j+gnFvFpEXUP5ZS2BSLteA\u002fEAuHjATk1z9GsnrEXuDRPwSQgsYxFeA\u002f+bA2S0MH2z\u002fuBXz\u002fTkrSPwktq1R2seA\u002fjzfuOmjz3D8BxrKwli7TPwxmeiQRa+A\u002f\u002fpjPQf0c3j8+VpPQTYPUP2Wl2+L7z+E\u002fj7BVdzqZ0T9Rs8TiGKfIP1V2FYV+gdg\u002foS0I7WMa0D+YLZowborBP1TvzfB2Zdg\u002fqV1+Hb3brT8AAAAAAAAAANkzri1VMc4\u002fnvJ6Dbr91z\u002f7csct+gHPP7f0CqNFt+A\u002fct4qYgHA4D+8kAAtI0raPxpEfaw3MOU\u002fP6ikpLdd4D9t05\u002f2fwvdPxzc8jCDBOY\u002fm7ANRiOh4T+6eVoJg0zeP4kYTtJBneY\u002fsGuDfdVb3T+X9MNiMdnNP5wuiiCt5eQ\u002fLjkkQ3641z+A6ndF4dXBPxbFCSXZH+Y\u002f9aa4DMXdwD9WnorvETKkP4yLkea4E+I\u002fxvdwHNBK2D8ouH8\u002fKNrPP4Rpt6BSZOA\u002f+rUjTAMk1j9OWT8pZfvLP4Kl51Ovwd4\u002fLxzCKITa2D+qVGo3hZ7FP8jSioi\u002fEuY\u002fELs\u002ffhyQ4D+1uxuBZl7bPy0fXmGq6uE\u002fsTX\u002f7YHE4D9LHORpnMHUPzn7gtyJT+Q\u002ffTL8bsi\u002f4T9+AXlJPwbaP+GFyC26s+g\u002fRpxjpgcJ3j\u002fuGGC+t2fUP9aBA8n64eA\u002fBotA9IiA3T9InPPy+bjSP8ouwyQY3eA\u002fiYZUCFRL3T9\u002fnaszL1XSPymROdsV5uA\u002fmXbk04s13z\u002fSjn6o2WDUP8pmq62i6+M\u002fDlzHA\u002fjJ4D\u002f2kUV+kifWP7o5k4A0xuY\u002fRQYJPIOP3z8SoMpLltrSP52L\u002fy4lbeU\u002f2CXHSXyW3j8AAAAAAADQP5OMinfqm+Y\u002ffIQiUwRV0z9960eym9S\u002fP+bUvhnBb+I\u002fAAAAAAAA0D+GG7i+xxu\u002fP0iCEJP34uA\u002fFPGfEb6ctT9vspNsoSiIP1haQOfvtdU\u002f3sh3TwSS4D850A1WHbzdPwZX\u002fwSR2uQ\u002fjWmVlpeR4T8E7OXOQ7jdP1gWm+4+B+c\u002fFzP6gayf4D8g1YCenDLTP76ixORxRuc\u002fCKRKlI+j4D\u002feMOClgyjTP3U4Smwhtec\u002fJE3Uhc6R4D9SUMOkZyXSP3Sz2jSkm+c\u002fcwbz498Z4j\u002frHzL58TDTP+KYBuKYBuo\u002fOlgdJjXh1T\u002fL4T9qWNK2PyP9syH9s+k\u002fHHRNr5oO3j\u002fz4EhH\u002flTVP8\u002faIPLy7+A\u002f0XBKR55f3j9VVVVVVVXVP95jgZeDBeE\u002f0XBKR55f3j9VVVVVVVXVP6YCjW2cAuE\u002f5UiiSBsc3j9Ssc16pkPVP7CRcYNUAOE\u002fIbYqVz6+2D8zMzMzMzPTP0MGd1MDv+A\u002f\u002f8ndThTc1z+SO0Gum37SP7zzRer\u002fuOA\u002fZDogvfvfzT8ZT+DKEje3PwfG6KBXoN0\u002fWQoufLjpxj+bV0Coa3GwPzLzl\u002fy1Z90\u002fAt2upt4o4T92SznXRK3cP6i1yvSOhuc\u002feDFlrpMk4T96V1WjF6\u002faP+mCFkxYguc\u002fDXPJcNVP4z+My5tT06bVP+EaWm1e3Oo\u002fSgBl73c45z+kukADgh\u002fXP6Qxay\u002fKHO0\u002fXZfuzp9U4D9l+U58hlTYP8hqpjP9ZeI\u002fTPozcc1t4D\u002faFqdubNTYP1myVvOiheI\u002fUY8acLV34D8oNlOt2+DYP5a0kGussOI\u002f4jmNB3Zd4D\u002fGuvb+pzvYP3mVeMa4a+I\u002fblRr\u002fzaS4D+Msa9bD4bZP\u002fvwJUDn\u002f+I\u002fN1eFCKY94D8HW9wzfETVP6ndozaCrOI\u002fwnvTF5yc3z\u002f+CuX\u002fRzLUP7d\u002fturPcOI\u002fPKXeac6A4D80DGTY74TQPw3s6z0+juc\u002fkHa3oIyd4T\u002fQvbHOqSfaP9E6ZOSaquY\u002fNQWjR9u23j+xfEfI0bbRP2keBoqbhOU\u002fGKWWkRAR0z8R8VJfy6fCP1aLMpnWF+A\u002f5gex1HqE0z9lbZWlXDTCP0diwkN22OA\u002fR97nnAnw1j+JOvccvkTJPwY2OQ1gXuM\u002fOOecc8453z9Nw59NWpvFP64IedSu+eg\u002fdspi\u002flmB4D\u002fa9zIJPljGPxi1a4s\u002fQes\u002fchzHcRzH4T+s+uBGMLHBP9M5PDbFX+0\u002fkzZgqojG3j9e+Lul4+TTP\u002fm+aPuJleU\u002fhC0P2YZc3D9ZFVfUdCfTP7qjkWWK2N4\u002fHmRAYa4v3D+ucSnrU1fQPylbQ9MRot4\u002fwIio\u002fnjc2D9ue2WDoIDPPz64BAUrZd4\u002fMmZ8UYK91T\u002fg7jRmonLOPzOpM1HgUd4\u002ffzPST+z91j+rGrsgQ8PKPyIuF1HlJuI\u002f+LCSkFYY4T9Qiq8emM3UPyxYgPRN4OY\u002fYFd5BSAi4D9hGWNSf3fSPwq2S9o\u002f4uY\u002fnZ5nEeeO4j9xjr3Ja73UPwlDZ6x5sug\u002fcM3pzcyW4j\u002fK67p96bXUP2uiQo1GEek\u002fgwOrPh+Y4j9timpx6TXUP5d9NifxbOk\u002f32QNJguX4j8tkXSDA5zKPxL6oN9Aiew\u002fajZd7Lnp5D830WoEnjfFP96yinatTO4\u002fQ5\u002fhzhjQ5j\u002f2qoS7S2C\u002fPwAAAAAAAPA\u002fkxwn3x7p3D+3evdPbDnUP4RIW7aiqOA\u002fW5D1Sc153D9E2N+zFfHTPxOO7Pcmz+A\u002ffk0cH9zV2z9rNnuC5XHTPyAigBFUw+A\u002fcYMmtmVa2z99Ywjv0D\u002fTPyy2EyuBt+A\u002fFImNulok4z+inmbjm6LVP1TuFd+iaOk\u002foO3jDxuG4D9u1jMb1YPQP7UGRnSNiug\u002fVXnNHFb73D9ZzHeHRxHJPwyFU4PFEuY\u002fgnUnZt70yz8FrlKysoKyP0I7GUvPueE\u002fDrv60cWnxD8dBqMxWcOiP5tVyQVD9uA\u002fb89tPMMTvj\u002fzx++qi2iAP4I6rwrhZeI\u002fD\u002fp7f3mwsj+12OVDLR50PysOGBqAK+I\u002fcNnKkxec3j9f\u002fCmmOb\u002fZP\u002fiAdwR7p+I\u002f1WcwbnUh3D\u002f97Pu1lA3UP6AlwbKmH+I\u002fCdxdIMY\u002f2z\u002fRV8gmaozSP5cWiEno8uE\u002f0QJLqxbV3D8cejBDy87TP8Z6bJULZOI\u002fWFGLqJks2z93qTffJlXRP2MiPKU6MeI\u002f8zYkb0Py3j8AAAAAAADYP8sUSdbkI+U\u002fccq5UUfG3z+MlOCGa3vTP5RbCqouIuY\u002fQ0v799UC3j+py\u002f8mwYDOPxc5Np84yOU\u002ftiICs9AGzj9z6N0xnni0P1BVB5G7XOQ\u002fm7iBVtAH3D\u002fH2878nerWP++lL\u002fLBGuE\u002fQjg42V4n3D\u002fM0tsKquLWP+u+C9vGGOE\u002fLykZwojU2z9iNHbKW9fUP9RtEDnpCuE\u002flYlMTQON3T8Y8DlDc\u002ffWPxdVsC7HaeI\u002f8jdXrQBn2j9EeOoiHW\u002fPP4TnIbtshOA\u002fx+rjdYdG2z+XBXv1K8DQP341UdqrI+E\u002f+1RQEkVL3T+NEF8OreDWPwhE+PBjeuI\u002f9YX2jN\u002fw4j+0QA634EfYP7adgzoes+c\u002fXVIJItER3j9CMg1jOWvSP7aipnyo8eY\u002fPR64m35g3D\u002fP0fgu4ZPMPwJesxQdceU\u002ftFimW7m\u002f3T+k4Nj6aCzKP1vWC2C2aec\u002fdO5rHnnp3z\u002fCz8BbqErZP4Bb27oVG+Q\u002fM4ymESor4D8BK+ZQ873cP+sWFbr8ruU\u002f0V9rLMPl5T+W5+j3LQLgPxLjcui6xeg\u002fWiPvon\u002f75T\u002f2kUiWib3fP8LlL5+FIek\u002fAAAAAAAA4D\u002fMXG7o9oLSP\u002f1HD3Wt4OY\u002fhARbQc257z9w3DuVUp7sPwAAAAAAAPA\u002fvm6A+IGI5D\u002fFw9QBcLzeP\u002f+BH5+0luc\u002f6X9xLJpI5j+KUMkiPszhP+HNmF0S4+k\u002fyMX+cDjo5j\u002f1Rq2q+wDjP9269fFKG+o\u002fcZ+A94Cq4T9rc68N3vLWP2j27FDvhOc\u002fxSMVI0qT1z8e0NhQQprBP5gWRQqrBOU\u002fi4ir0X4S4z+SxjnBYY3bP6Rux\u002f0vH+c\u002fSjYD\u002f3T06j99Ux3+H2LlP12QgU0oT+8\u002f+eVS7Pwrwz+zywuO\u002fam9P8N7ZCoUNs0\u002fpODCUQou3D+xfjye9jPRP9KWNnhQjuE\u002fJiqpCH2\u002f5j98aEvSP+ncP6\u002f6G3q+iOo\u002fQbLOlQck5z8AAAAAAADgP4GU5G7pAuw\u002fRdTr7hCH6j+DfakfkWLmPyzreDYTGO0\u002fJgI1r8670D8hqFAA0wvKP0hMYvvQBdo\u002fhf6GRvT15T89hUl86aXhP1rb4B0M1Oc\u002fcDwzFSRN4T8H8LzrIE7cP6V7EA8ADOY\u002fspce0WlI4z9ld7HQHxjcP1yPokhH++c\u002f3qdpPQFA5z\u002fS2x0cigXdP0fO3PkzqOw\u002f7rtxo3FO7j+XQ1hooiDnPwAAAAAAAPA\u002fZ8MzB3Ls6z9Bee6LMAvnP4fsMfdTTu4\u002fAafiRTqY7j+d32FjZLrrPwAAAAAAAPA\u002fAAAAAAAA8D+6G2KqLY7tPwAAAAAAAPA\u002fAAAAAAAA8D+eCt26x0PuPwAAAAAAAPA\u002f+3Zw5EoE5D8AAAAAAADgPxMUPmIvO+c\u002frIXWhHnw3D9r6AVlTgHaP2oUaVgks+E\u002f40TZWDQq3D9p3crciUPWPx\u002fNTLNl\u002fOA\u002fQ4jsDCs14T9xKPErcUHcP7pZl\u002f\u002fEZuY\u002fx1lJpZny2j\u002fUsvYfQJXRP24J8xzfrd8\u002fcAoyQabM0D8N1N18DMLFPzvMZ5iTSNs\u002fx5rGWqnU0D\u002fyVPVzmbrFP0LpH0ZfQ9s\u002fhJrg+z5lxz8fyl27DuK9P+Rya6khZdc\u002fto93CKMD4D9bokRXl0HbPyA8HNTM6uI\u002fbDgmp9xM3z\u002f0rsMsURfSPwiRiFGuCOc\u002fAAAAAAAA8D+jSGXqr+TnPwAAAAAAAPA\u002f8qPQCtLL4T+cSf0vTjfdP8NmbBFuDec\u002fmD2qpM124T8gxTRu5mPXP6YSZ+4Zduc\u002fhJ6KgGsD4D83LMh1uXjSP1hWUibvKec\u002fb4ACeqxg4D9ws1aswobaP\u002f1l+C502OI\u002f7U\u002fMUM474T\u002fdw4URXAfbP\u002fS+fNofXOU\u002fD90R886n4T8MxID3a2bcP0IwA11ETOY\u002fLCoKq4w74T+34g4LGvXaP5dl1Hu2L+U\u002fj\u002fRl6Ehp4D\u002fPcwW3vwfaP5U9wldHLOM\u002fQGdq5y8Z4T9igovov1TaP79rCwZv5uQ\u002fdhBWtUaa2z8mitb\u002fQa3QPxOe3b\u002fqOeI\u002fnn6jsp992T8XbS0j5lDNP03DjENKHeE\u002fQFP\u002fJkTG2j\u002fM41WbaQ7QP4ouDXqaq+E\u002fd7vPPCRT4T8AgrhziyLRP96swYWmzuc\u002ftT1+tZTw2z9e\u002fgUkjK\u002fUP5r3M7kgWuE\u002f1fNiqQPy2z9zx5MinLDUP1qw53D9Z+E\u002fjF7dFlQe2z+aHP11bDjSP4NvydvPSuE\u002fU5bCjN452j9AfliLZI7RPx0MysGgHOA\u002f\u002f0Pr5K1M2T\u002fmQq4iY\u002fPOPyb\u002fC1gvad8\u002fXsfU7pZP2T8Ti3tBQpzPPxpHx8Tn\u002fd8\u002fJQkg+3Pi2D8bsy0jtejMP3jNyWWAleA\u002fOQwGbyMx2j9oL+o1VTPOP9D7oE1WcOE\u002fAl3qXPx22j\u002fkXVw+pL7NP6s\u002fBA3PdOE\u002fo9TNB2o42j+cp6VfjvbNPwLttpjbfOE\u002fS\u002fG5H9sZ2j8JlH4eDZbMP\u002fGS9Mkqi+E\u002ftr60A8tc2j9DzqHn3PTMP4+pFV+ojOE\u002fc96Gj+uM2z\u002fpH8TdOlrOP29qqmqmruI\u002fqpLV7LuC2z+pBO3En63NP+LReezovuI\u002fBHbp1Eqh2z+FyixQQ+\u002fNP7vRkBOY\u002fuI\u002fdlGRDFJY2T\u002fHk1Uhs7TKP\u002fvD4QIWkOE\u002fVywyGOam2T\u002fE79uvvxvKP+tfkFgNDOI\u002fN\u002f1sjSd+2T+z8VrngO7JP53yD+o6qeI\u002fVif\u002fzDxr2T8E0mX3Pq3JP0hqwZFV7uI\u002fmyAsuWpl2T8YGUy1x3rJPxWbUNwuTeM\u002fzKUZZbx\u002f1D9HiMORCALHP090u5GHceE\u002fyF7WfS8Axj8idagIPV+vP38KZqb6Zto\u002fAlCuVF94wz\u002fVNIKYBleiPwFHdBgMuNQ\u002f3PjHjFnatT\u002f4coWxB2KWPxOLe0FCnM8\u002fGfCrJKUbfT8Oa1A87XFlP8YyPOZ2bcU\u002f1MK\u002flE6jyj8wAlxbo\u002fTFPzlSBmNsE9U\u002fMQxoNhVx2z\u002fcYh81XjvQP+dqzMGwk+I\u002fQeKiW5ji4T\u002fl7EWCrAndP4jCxxkqhuY\u002fNrX6P1xL7T\u002fjx\u002fE1R3nmPzPjJISJB+4\u002fxTD\u002fH++J5z\u002fXx+D59crcPyxTziEkqtk\u002fjiAfUrVf4D\u002fZAv2YLdDfP5X0BuxFXNg\u002fDxEcXOQI4T8mUaYzigniP1VqF06xK+A\u002fE2YwDw4V5j8IyxC1K8nfPz+v3HIoq9c\u002fCrfZSqWI5T+HP5Q9S0PdPwwjSux\u002fFdg\u002f6aIAoGRQ4D9qAK8PgDveP8x6lA\u002fg69k\u002fy9zD8+NB4T8F7nIi2irdP5INIGBmztc\u002f7o3G7HVP4D8Cth6fRHTePxz8Ax9ePto\u002fEvBcGVX34T\u002fChMWuddjUP5IEnOW9is4\u002fXtfmhXen2T\u002fLCaukVBfVP8k+y2Efp84\u002f+9RjPb7V2T8uAoUgUjHVP2sOUeyI984\u002fZeYMvJcL2z\u002fQRq1fH67WPz3vObj0h9E\u002fUV+T2N9J3T8Yy609vR\u002fVP9SX\u002fpwjLM4\u002frxQ2d2Pp2j+yS21zEAXWP5R3VR9+ItA\u002f2D2NFfB33T80E55u2sTVP+80FltUOs4\u002fu5HuNwHV3T8UwWyZWnXVP\u002fLlAqYL+8w\u002fTHX97CJl3T8qDERMIOXkP\u002fjTwd6b\u002f9w\u002fc5Bo3OqF6D8WZVcToLflP1iPrjBhkN0\u002fHOe5Qz0\u002f6T8xtYBgGkDeP9uHTZKTxNM\u002fNp00YYMw5j\u002fQQsQkwiviP3CTR4TNWNY\u002fVX2QmSQI6D+YTLiE2GLkP15wQzM6lNc\u002f3qT\u002f1EGX6T8f6hOhsHXgPwNkpBhladM\u002fawjZO0JF6D9L0\u002fR3zX3cP0NMxOm+ocs\u002fS6uiI1Sx5j+UgUUU9mTpPxmFtYCmudQ\u002fAAAAAAAA8D8ET0EKkSrdPyGH6EDh79c\u002fO8YPxxpT4D\u002fuGuobPAjgP0vaG1HNnto\u002fogt92AOk4j8S3EkDAyDhPy9VTUdMfNw\u002fHI+evGxw5T\u002fuhx\u002f6P6PjP6lcnUscMuA\u002fbUlQ9fVw5j8bfk7kJCneP8vElWDLM8A\u002fzUW0JUGo6j+7P1OyIYniP0wtnBu6N74\u002fguUZ4\u002f6y7T\u002fvCGPwGn7dP3J6sjHrf9g\u002fI6EjKcs84D876iJVaZneP4EKsAq8HNo\u002fAMLWl0gB4T9bAT8FvgTdP\u002fcTAOmuqtc\u002f\u002fVhAXORu4D8xFLvS1nveP8XldwdhqNk\u002fZ5u1vdkS4T\u002fzaTVEjb7aP+hpUgeDStY\u002fm59ao1Fj3z8Q2zekbAHfPw3+ZsCgB9o\u002ffKP9bPbP4T9423w6X5fePxLNV7en2Ng\u002fsNonhBqP4T\u002fejUyWdNTbPx8FET2UftY\u002fpufCstpH4D\u002fuGhte677gP+KWNA48d9s\u002fCBydwEi\u002f5D+ta+44ErnhP0vcBmdEw90\u002fdQwDlnkl5j\u002fxcs8z+8\u002fnP\u002fpcmaHpieE\u002fmXjmuXz\u002f6j96TsUo6EPOP86Fr8aydLU\u002fTogD1e0n3z85UWiYicPkP3eB\u002fnjkVuo\u002fcW7xD\u002f8Y5z9J1RPMg1HrP66W9fq6Duk\u002fkHxesK8T7D+\u002foHjuq\u002fTrP9UciYwYmuo\u002fRPOLlYe\u002f7j9Rc44lAM\u002ftP\u002fmir29Hhes\u002f5bdNEwyU7z8AAAAAAADwPx0EWDK26O8\u002fAAAAAAAA8D8AAAAAAADwPwAAAAAAAPA\u002f6+FOwNuE3D9InYiwI\u002fnXPy72fsUWzt4\u002fP2SSWjyZ3T\u002fZCK6N4NrYP5rjvtKwvOA\u002fhs8pxgo93T9vc0jjsxbYP\u002fkxJhD1heA\u002fOY5l+evA3T9ImYOUOUjZP2NZRTM03OA\u002f6SdCR56qzD9e1eQ56MLCP7wrPHJjTNM\u002fC2Xc+9HB4j+lYQu51eDbP87RIU0u0OU\u002fR8xeNL1J5D+lXAolf2DeP0fEjGsdD+g\u002f3x7URqAE5j9cZlSaKzjhP5EL9vQMK+o\u002f3azJGZUI1T\u002fXYkp+WpfQP0euyRwT19s\u002fudLX\u002fP4G3T\u002fGN7fls9\u002fSP0SuTZzxb+I\u002f5vnzDGZg4T+Q1aaJ6n\u002fbP1mBTLE2IOY\u002fUyOCHTgv2j+2Ibcz01\u002fVPzBOItezEOE\u002f9rlYhvWO2T8YewPbKQrVPywk2a8XWeA\u002fZopFVJiI2j+P5dCrgYHVP5uwICdgOeE\u002fBlvCHyDZ2D8LEmfwK8jTP2DE9ocst98\u002f0OGAYv0b1z8KQg\u002f7T5jRPyNaUoW6Lt0\u002fcuZZ8ab21T9SAJozDEvRP9U1R8bMHtw\u002fBg8nX6E31D9FDL6gzNnNP85L0zAJCts\u002f5OWzjVfl0D\u002fLpMkUPkXFPzLCTdXy3dc\u002fJZPBlycL0D8IGQW5Zz7DP\u002fKzanlcB9Y\u002fEwCeyQrBzT+X6EbMm0DCP6L8VDyykNU\u002faE6R2W4+0T+Wg6mGiJ7CP4SgL7w+AN0\u002fGbrF5S9E0j\u002fMxYxc6w7EP1w925Ro3OA\u002f8YnFMaO40T\u002f1zd2Yk2jCP4117sP4IOE\u002fc\u002fKifboR0j9ZRIOEmFDCP7IRmEvh3OE\u002f6aONHzIt0D9RuaBla1m\u002fP6l1v8A4t+A\u002fDD0+\u002fdM8zj8gdM6rsFq9P3P\u002fif0p8OA\u002f"},"xbins":{"end":1.0,"size":0.05,"start":0.0},"type":"histogram","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.445],"title":{"text":"Mean predicted probability"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Observed frequency"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"xaxis2":{"anchor":"y2","domain":[0.555,1.0],"title":{"text":"Predicted probability"},"range":[0,1],"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Count"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Calibration Curve Overlay","x":0.2225,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Probability Distribution Overlay","x":0.7775000000000001,"xanchor":"center","xref":"paper","y":0.98,"yanchor":"bottom","yref":"paper"}],"font":{"color":"#e8f1fa"},"legend":{"font":{"size":11},"orientation":"h","x":0.0,"y":1.24,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":144,"b":48},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":430,"barmode":"overlay"},                        {"responsive": true}                    )                };            </script>        </div></div>
+    <div class="chart-wrap"><div>                            <div id="5d83b033-1dc5-4f9d-abbd-25b77753576a" class="plotly-graph-div" style="height:360px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("5d83b033-1dc5-4f9d-abbd-25b77753576a")) {                    Plotly.newPlot(                        "5d83b033-1dc5-4f9d-abbd-25b77753576a",                        [{"marker":{"color":"#4fd1c5"},"name":"Model K RT: Low Volatility","x":["Brier Score","Reliability","Resolution","Uncertainty","Brier From Decomp"],"y":[0.13509343915343913,0.0038029227114663527,0.11692170030856378,0.24995268889448782,0.13683391129739042],"type":"bar"},{"marker":{"color":"#ff8f70"},"name":"Model M RT: Low Volatility","x":["Brier Score","Reliability","Resolution","Uncertainty","Brier From Decomp"],"y":[0.16009949339151003,0.027724184629081598,0.11579751802070982,0.24995268889448782,0.1618793555028596],"type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"yaxis":{"title":{"text":"Metric value"},"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"},"font":{"color":"#e8f1fa"},"legend":{"font":{"size":11},"orientation":"h","x":0.0,"y":1.22,"xanchor":"left","yanchor":"bottom","bgcolor":"rgba(0,0,0,0)","borderwidth":0},"margin":{"l":56,"r":28,"t":136,"b":48},"paper_bgcolor":"#0d1b26","plot_bgcolor":"#0d1b26","height":360,"barmode":"group","xaxis":{"gridcolor":"#22384a","linecolor":"#35516c","zerolinecolor":"#35516c"}},                        {"responsive": true}                    )                };            </script>        </div></div>
+  </section>
+
+  <h2>Metric Summary</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_focus</th>
+      <th>n_event_contracts_benchmark</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_focus</th>
+      <th>log_loss_benchmark</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>316</td>
+      <td>316</td>
+      <td>0</td>
+      <td>70</td>
+      <td>70</td>
+      <td>0</td>
+      <td>0.5285</td>
+      <td>0.5285</td>
+      <td>+0.0000</td>
+      <td>0.4564</td>
+      <td>0.5528</td>
+      <td>-0.0965</td>
+      <td>0.1910</td>
+      <td>0.1757</td>
+      <td>+0.0152</td>
+      <td>0.5573</td>
+      <td>0.5213</td>
+      <td>+0.0361</td>
+      <td>0.7342</td>
+      <td>0.7152</td>
+      <td>+0.0190</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>317</td>
+      <td>317</td>
+      <td>0</td>
+      <td>70</td>
+      <td>70</td>
+      <td>0</td>
+      <td>0.2177</td>
+      <td>0.2177</td>
+      <td>+0.0000</td>
+      <td>0.3126</td>
+      <td>0.2827</td>
+      <td>+0.0299</td>
+      <td>0.1283</td>
+      <td>0.1234</td>
+      <td>+0.0049</td>
+      <td>0.4150</td>
+      <td>0.3846</td>
+      <td>+0.0304</td>
+      <td>0.8423</td>
+      <td>0.8233</td>
+      <td>+0.0189</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>312</td>
+      <td>312</td>
+      <td>0</td>
+      <td>69</td>
+      <td>69</td>
+      <td>0</td>
+      <td>0.7788</td>
+      <td>0.7788</td>
+      <td>+0.0000</td>
+      <td>0.5971</td>
+      <td>0.7900</td>
+      <td>-0.1929</td>
+      <td>0.1611</td>
+      <td>0.1058</td>
+      <td>+0.0554</td>
+      <td>0.4943</td>
+      <td>0.3267</td>
+      <td>+0.1675</td>
+      <td>0.8365</td>
+      <td>0.8205</td>
+      <td>+0.0160</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>945</td>
+      <td>945</td>
+      <td>0</td>
+      <td>209</td>
+      <td>209</td>
+      <td>0</td>
+      <td>0.5069</td>
+      <td>0.5069</td>
+      <td>+0.0000</td>
+      <td>0.4546</td>
+      <td>0.5405</td>
+      <td>-0.0859</td>
+      <td>0.1601</td>
+      <td>0.1351</td>
+      <td>+0.0250</td>
+      <td>0.4888</td>
+      <td>0.4112</td>
+      <td>+0.0776</td>
+      <td>0.8042</td>
+      <td>0.7862</td>
+      <td>+0.0180</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Brier Decomposition</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>reliability_focus</th>
+      <th>reliability_benchmark</th>
+      <th>reliability_delta</th>
+      <th>resolution_focus</th>
+      <th>resolution_benchmark</th>
+      <th>resolution_delta</th>
+      <th>uncertainty_focus</th>
+      <th>uncertainty_benchmark</th>
+      <th>uncertainty_delta</th>
+      <th>brier_from_decomposition_focus</th>
+      <th>brier_from_decomposition_benchmark</th>
+      <th>brier_from_decomposition_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>316</td>
+      <td>316</td>
+      <td>0</td>
+      <td>0.1910</td>
+      <td>0.1757</td>
+      <td>+0.0152</td>
+      <td>0.0283</td>
+      <td>0.0078</td>
+      <td>+0.0205</td>
+      <td>0.0850</td>
+      <td>0.0779</td>
+      <td>+0.0071</td>
+      <td>0.2492</td>
+      <td>0.2492</td>
+      <td>+0.0000</td>
+      <td>0.1925</td>
+      <td>0.1791</td>
+      <td>+0.0135</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>317</td>
+      <td>317</td>
+      <td>0</td>
+      <td>0.1283</td>
+      <td>0.1234</td>
+      <td>+0.0049</td>
+      <td>0.0178</td>
+      <td>0.0085</td>
+      <td>+0.0093</td>
+      <td>0.0592</td>
+      <td>0.0542</td>
+      <td>+0.0051</td>
+      <td>0.1703</td>
+      <td>0.1703</td>
+      <td>+0.0000</td>
+      <td>0.1289</td>
+      <td>0.1246</td>
+      <td>+0.0043</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>312</td>
+      <td>312</td>
+      <td>0</td>
+      <td>0.1611</td>
+      <td>0.1058</td>
+      <td>+0.0554</td>
+      <td>0.0493</td>
+      <td>0.0096</td>
+      <td>+0.0397</td>
+      <td>0.0577</td>
+      <td>0.0744</td>
+      <td>-0.0167</td>
+      <td>0.1722</td>
+      <td>0.1722</td>
+      <td>+0.0000</td>
+      <td>0.1639</td>
+      <td>0.1074</td>
+      <td>+0.0564</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>945</td>
+      <td>945</td>
+      <td>0</td>
+      <td>0.1601</td>
+      <td>0.1351</td>
+      <td>+0.0250</td>
+      <td>0.0277</td>
+      <td>0.0038</td>
+      <td>+0.0239</td>
+      <td>0.1158</td>
+      <td>0.1169</td>
+      <td>-0.0011</td>
+      <td>0.2500</td>
+      <td>0.2500</td>
+      <td>+0.0000</td>
+      <td>0.1619</td>
+      <td>0.1368</td>
+      <td>+0.0250</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Expanded Calibration Error</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>expected_calibration_error_focus</th>
+      <th>expected_calibration_error_benchmark</th>
+      <th>expected_calibration_error_delta</th>
+      <th>root_mean_squared_calibration_error_focus</th>
+      <th>root_mean_squared_calibration_error_benchmark</th>
+      <th>root_mean_squared_calibration_error_delta</th>
+      <th>max_calibration_error_focus</th>
+      <th>max_calibration_error_benchmark</th>
+      <th>max_calibration_error_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>316</td>
+      <td>316</td>
+      <td>0</td>
+      <td>0.1177</td>
+      <td>0.0749</td>
+      <td>+0.0429</td>
+      <td>0.1683</td>
+      <td>0.0883</td>
+      <td>+0.0800</td>
+      <td>0.3225</td>
+      <td>0.1603</td>
+      <td>+0.1621</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>317</td>
+      <td>317</td>
+      <td>0</td>
+      <td>0.1214</td>
+      <td>0.0702</td>
+      <td>+0.0512</td>
+      <td>0.1336</td>
+      <td>0.0922</td>
+      <td>+0.0414</td>
+      <td>0.3383</td>
+      <td>0.2620</td>
+      <td>+0.0763</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>312</td>
+      <td>312</td>
+      <td>0</td>
+      <td>0.1967</td>
+      <td>0.0812</td>
+      <td>+0.1155</td>
+      <td>0.2220</td>
+      <td>0.0977</td>
+      <td>+0.1243</td>
+      <td>0.3097</td>
+      <td>0.2950</td>
+      <td>+0.0147</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>945</td>
+      <td>945</td>
+      <td>0</td>
+      <td>0.1327</td>
+      <td>0.0457</td>
+      <td>+0.0870</td>
+      <td>0.1665</td>
+      <td>0.0617</td>
+      <td>+0.1048</td>
+      <td>0.2876</td>
+      <td>0.1675</td>
+      <td>+0.1202</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Sharpness</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>forecast_std_focus</th>
+      <th>forecast_std_benchmark</th>
+      <th>forecast_std_delta</th>
+      <th>sharpness_variance_from_base_rate_focus</th>
+      <th>sharpness_variance_from_base_rate_benchmark</th>
+      <th>sharpness_variance_from_base_rate_delta</th>
+      <th>mean_abs_distance_from_0_5_focus</th>
+      <th>mean_abs_distance_from_0_5_benchmark</th>
+      <th>mean_abs_distance_from_0_5_delta</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_focus</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_benchmark</th>
+      <th>mean_predictive_variance_p_times_1_minus_p_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ATM</td>
+      <td>316</td>
+      <td>316</td>
+      <td>0</td>
+      <td>0.5285</td>
+      <td>0.5285</td>
+      <td>+0.0000</td>
+      <td>0.4564</td>
+      <td>0.5528</td>
+      <td>-0.0965</td>
+      <td>0.1830</td>
+      <td>0.2784</td>
+      <td>-0.0953</td>
+      <td>0.0387</td>
+      <td>0.0781</td>
+      <td>-0.0394</td>
+      <td>0.1375</td>
+      <td>0.2389</td>
+      <td>-0.1014</td>
+      <td>0.2146</td>
+      <td>0.1697</td>
+      <td>+0.0449</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>317</td>
+      <td>317</td>
+      <td>0</td>
+      <td>0.2177</td>
+      <td>0.2177</td>
+      <td>+0.0000</td>
+      <td>0.3126</td>
+      <td>0.2827</td>
+      <td>+0.0299</td>
+      <td>0.1752</td>
+      <td>0.2509</td>
+      <td>-0.0758</td>
+      <td>0.0397</td>
+      <td>0.0672</td>
+      <td>-0.0275</td>
+      <td>0.2265</td>
+      <td>0.3007</td>
+      <td>-0.0743</td>
+      <td>0.1842</td>
+      <td>0.1398</td>
+      <td>+0.0444</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>312</td>
+      <td>312</td>
+      <td>0</td>
+      <td>0.7788</td>
+      <td>0.7788</td>
+      <td>+0.0000</td>
+      <td>0.5971</td>
+      <td>0.7900</td>
+      <td>-0.1929</td>
+      <td>0.1731</td>
+      <td>0.2090</td>
+      <td>-0.0359</td>
+      <td>0.0630</td>
+      <td>0.0438</td>
+      <td>+0.0192</td>
+      <td>0.1473</td>
+      <td>0.3254</td>
+      <td>-0.1782</td>
+      <td>0.2106</td>
+      <td>0.1222</td>
+      <td>+0.0884</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>945</td>
+      <td>945</td>
+      <td>0</td>
+      <td>0.5069</td>
+      <td>0.5069</td>
+      <td>+0.0000</td>
+      <td>0.4546</td>
+      <td>0.5405</td>
+      <td>-0.0859</td>
+      <td>0.2118</td>
+      <td>0.3231</td>
+      <td>-0.1112</td>
+      <td>0.0476</td>
+      <td>0.1055</td>
+      <td>-0.0579</td>
+      <td>0.1706</td>
+      <td>0.2882</td>
+      <td>-0.1177</td>
+      <td>0.2031</td>
+      <td>0.1440</td>
+      <td>+0.0591</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Outcome Join Coverage</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>scope</th>
+      <th>value</th>
+      <th>total_forecast_rows_focus</th>
+      <th>total_forecast_rows_benchmark</th>
+      <th>total_forecast_rows_delta</th>
+      <th>matched_rows_focus</th>
+      <th>matched_rows_benchmark</th>
+      <th>matched_rows_delta</th>
+      <th>unmatched_rows_focus</th>
+      <th>unmatched_rows_benchmark</th>
+      <th>unmatched_rows_delta</th>
+      <th>match_rate_focus</th>
+      <th>match_rate_benchmark</th>
+      <th>match_rate_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>contract_label</td>
+      <td>ATM</td>
+      <td>316</td>
+      <td>316</td>
+      <td>0</td>
+      <td>316</td>
+      <td>316</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>OTM+1</td>
+      <td>317</td>
+      <td>317</td>
+      <td>0</td>
+      <td>317</td>
+      <td>317</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>OTM-1</td>
+      <td>312</td>
+      <td>312</td>
+      <td>0</td>
+      <td>312</td>
+      <td>312</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>overall</td>
+      <td>all</td>
+      <td>945</td>
+      <td>945</td>
+      <td>0</td>
+      <td>945</td>
+      <td>945</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260408_1000UTC__KXBTCD-26APR0807.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260408_2000UTC__KXBTCD-26APR0817.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_0300UTC__KXBTCD-26APR0900.csv</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_0400UTC__KXBTCD-26APR0901.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_1000UTC__KXBTCD-26APR0907.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_1100UTC__KXBTCD-26APR0908.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_0200UTC__KXBTCD-26APR0923.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_0300UTC__KXBTCD-26APR1000.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_0700UTC__KXBTCD-26APR1004.csv</td>
+      <td>36</td>
+      <td>36</td>
+      <td>0</td>
+      <td>36</td>
+      <td>36</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_0900UTC__KXBTCD-26APR1006.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_1000UTC__KXBTCD-26APR1007.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_2200UTC__KXBTCD-26APR1019.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_2300UTC__KXBTCD-26APR1020.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0000UTC__KXBTCD-26APR1021.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0100UTC__KXBTCD-26APR1022.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0200UTC__KXBTCD-26APR1023.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0300UTC__KXBTCD-26APR1100.csv</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0500UTC__KXBTCD-26APR1102.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0600UTC__KXBTCD-26APR1103.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0700UTC__KXBTCD-26APR1104.csv</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0800UTC__KXBTCD-26APR1105.csv</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0900UTC__KXBTCD-26APR1106.csv</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_1000UTC__KXBTCD-26APR1107.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_1100UTC__KXBTCD-26APR1108.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_1200UTC__KXBTCD-26APR1109.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_1400UTC__KXBTCD-26APR1111.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0600UTC__KXBTCD-26APR1203.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0700UTC__KXBTCD-26APR1204.csv</td>
+      <td>39</td>
+      <td>39</td>
+      <td>0</td>
+      <td>39</td>
+      <td>39</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0800UTC__KXBTCD-26APR1205.csv</td>
+      <td>33</td>
+      <td>33</td>
+      <td>0</td>
+      <td>33</td>
+      <td>33</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0900UTC__KXBTCD-26APR1206.csv</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>27</td>
+      <td>27</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_1100UTC__KXBTCD-26APR1208.csv</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_1900UTC__KXBTCD-26APR1216.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260413_0600UTC__KXBTCD-26APR1303.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260413_1100UTC__KXBTCD-26APR1308.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260414_0600UTC__KXBTCD-26APR1403.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260416_0900UTC__KXBTCD-26APR1606.csv</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260416_1100UTC__KXBTCD-26APR1608.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0200UTC__KXBTCD-26APR1623.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0300UTC__KXBTCD-26APR1700.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0400UTC__KXBTCD-26APR1701.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0500UTC__KXBTCD-26APR1702.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0600UTC__KXBTCD-26APR1703.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0700UTC__KXBTCD-26APR1704.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_1100UTC__KXBTCD-26APR1708.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_2100UTC__KXBTCD-26APR1718.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_2200UTC__KXBTCD-26APR1719.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0100UTC__KXBTCD-26APR1722.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0200UTC__KXBTCD-26APR1723.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0300UTC__KXBTCD-26APR1800.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0400UTC__KXBTCD-26APR1801.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0500UTC__KXBTCD-26APR1802.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0600UTC__KXBTCD-26APR1803.csv</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0700UTC__KXBTCD-26APR1804.csv</td>
+      <td>75</td>
+      <td>75</td>
+      <td>0</td>
+      <td>75</td>
+      <td>75</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_2100UTC__KXBTCD-26APR1818.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_2300UTC__KXBTCD-26APR1820.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260419_0000UTC__KXBTCD-26APR1821.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260419_1000UTC__KXBTCD-26APR1907.csv</td>
+      <td>4</td>
+      <td>4</td>
+      <td>0</td>
+      <td>4</td>
+      <td>4</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260421_0400UTC__KXBTCD-26APR2101.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260421_0500UTC__KXBTCD-26APR2102.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0400UTC__KXBTCD-26APR2201.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0700UTC__KXBTCD-26APR2204.csv</td>
+      <td>60</td>
+      <td>60</td>
+      <td>0</td>
+      <td>60</td>
+      <td>60</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0900UTC__KXBTCD-26APR2206.csv</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_1000UTC__KXBTCD-26APR2207.csv</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>30</td>
+      <td>30</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_1800UTC__KXBTCD-26APR2215.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_2000UTC__KXBTCD-26APR2217.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_2100UTC__KXBTCD-26APR2218.csv</td>
+      <td>17</td>
+      <td>17</td>
+      <td>0</td>
+      <td>17</td>
+      <td>17</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_2200UTC__KXBTCD-26APR2219.csv</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260423_2100UTC__KXBTCD-26APR2318.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260423_2300UTC__KXBTCD-26APR2320.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260424_0700UTC__KXBTCD-26APR2404.csv</td>
+      <td>48</td>
+      <td>48</td>
+      <td>0</td>
+      <td>48</td>
+      <td>48</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+      <td>+0.0000</td>
+    </tr>
+  </tbody>
+</table></div>
+  </section>
+
+  <h2>Time Bucket Comparison</h2>
+  <section class="section-stack">
+    <section class="panel">
+      <h3>Isolated Minute Metrics</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_focus</th>
+      <th>n_event_contracts_benchmark</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_focus</th>
+      <th>log_loss_benchmark</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0.7619</td>
+      <td>0.7619</td>
+      <td>+0.0000</td>
+      <td>0.4636</td>
+      <td>0.5690</td>
+      <td>-0.1054</td>
+      <td>0.2422</td>
+      <td>0.1617</td>
+      <td>+0.0805</td>
+      <td>0.6778</td>
+      <td>0.4970</td>
+      <td>+0.1808</td>
+      <td>0.6667</td>
+      <td>0.7143</td>
+      <td>-0.0476</td>
+    </tr>
+    <tr>
+      <td>Minute 30</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0.6667</td>
+      <td>0.6667</td>
+      <td>+0.0000</td>
+      <td>0.4416</td>
+      <td>0.5594</td>
+      <td>-0.1179</td>
+      <td>0.2317</td>
+      <td>0.2208</td>
+      <td>+0.0110</td>
+      <td>0.6567</td>
+      <td>0.6356</td>
+      <td>+0.0211</td>
+      <td>0.6667</td>
+      <td>0.6111</td>
+      <td>+0.0556</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+    <section class="panel">
+      <h3>10-Minute Bucket Metrics</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>n_event_contracts_focus</th>
+      <th>n_event_contracts_benchmark</th>
+      <th>n_event_contracts_delta</th>
+      <th>base_rate_focus</th>
+      <th>base_rate_benchmark</th>
+      <th>base_rate_delta</th>
+      <th>mean_p_kalshi_focus</th>
+      <th>mean_p_kalshi_benchmark</th>
+      <th>mean_p_kalshi_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>log_loss_focus</th>
+      <th>log_loss_benchmark</th>
+      <th>log_loss_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>177</td>
+      <td>177</td>
+      <td>0</td>
+      <td>93</td>
+      <td>93</td>
+      <td>0</td>
+      <td>0.5706</td>
+      <td>0.5706</td>
+      <td>+0.0000</td>
+      <td>0.4446</td>
+      <td>0.5260</td>
+      <td>-0.0815</td>
+      <td>0.2154</td>
+      <td>0.1739</td>
+      <td>+0.0415</td>
+      <td>0.6210</td>
+      <td>0.5234</td>
+      <td>+0.0976</td>
+      <td>0.7006</td>
+      <td>0.7458</td>
+      <td>-0.0452</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>165</td>
+      <td>165</td>
+      <td>0</td>
+      <td>87</td>
+      <td>87</td>
+      <td>0</td>
+      <td>0.4424</td>
+      <td>0.4424</td>
+      <td>+0.0000</td>
+      <td>0.4475</td>
+      <td>0.5510</td>
+      <td>-0.1035</td>
+      <td>0.1928</td>
+      <td>0.1769</td>
+      <td>+0.0159</td>
+      <td>0.5736</td>
+      <td>0.5247</td>
+      <td>+0.0489</td>
+      <td>0.7636</td>
+      <td>0.7152</td>
+      <td>+0.0485</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>135</td>
+      <td>135</td>
+      <td>0</td>
+      <td>78</td>
+      <td>78</td>
+      <td>0</td>
+      <td>0.5556</td>
+      <td>0.5556</td>
+      <td>+0.0000</td>
+      <td>0.4724</td>
+      <td>0.5816</td>
+      <td>-0.1092</td>
+      <td>0.1920</td>
+      <td>0.1837</td>
+      <td>+0.0083</td>
+      <td>0.5691</td>
+      <td>0.5502</td>
+      <td>+0.0190</td>
+      <td>0.7630</td>
+      <td>0.7037</td>
+      <td>+0.0593</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>171</td>
+      <td>171</td>
+      <td>0</td>
+      <td>98</td>
+      <td>98</td>
+      <td>0</td>
+      <td>0.4561</td>
+      <td>0.4561</td>
+      <td>+0.0000</td>
+      <td>0.4401</td>
+      <td>0.5249</td>
+      <td>-0.0848</td>
+      <td>0.1468</td>
+      <td>0.1273</td>
+      <td>+0.0196</td>
+      <td>0.4678</td>
+      <td>0.3952</td>
+      <td>+0.0726</td>
+      <td>0.8480</td>
+      <td>0.7719</td>
+      <td>+0.0760</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>150</td>
+      <td>150</td>
+      <td>0</td>
+      <td>84</td>
+      <td>84</td>
+      <td>0</td>
+      <td>0.5267</td>
+      <td>0.5267</td>
+      <td>+0.0000</td>
+      <td>0.4872</td>
+      <td>0.5702</td>
+      <td>-0.0830</td>
+      <td>0.1240</td>
+      <td>0.0945</td>
+      <td>+0.0294</td>
+      <td>0.4074</td>
+      <td>0.2964</td>
+      <td>+0.1111</td>
+      <td>0.8667</td>
+      <td>0.8600</td>
+      <td>+0.0067</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>147</td>
+      <td>147</td>
+      <td>0</td>
+      <td>68</td>
+      <td>68</td>
+      <td>0</td>
+      <td>0.4966</td>
+      <td>0.4966</td>
+      <td>+0.0000</td>
+      <td>0.4420</td>
+      <td>0.4962</td>
+      <td>-0.0542</td>
+      <td>0.0797</td>
+      <td>0.0473</td>
+      <td>+0.0324</td>
+      <td>0.2681</td>
+      <td>0.1569</td>
+      <td>+0.1111</td>
+      <td>0.8980</td>
+      <td>0.9320</td>
+      <td>-0.0340</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+    <section class="panel">
+      <h3>Accuracy Evaluation</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>correct_forecasts_focus</th>
+      <th>correct_forecasts_benchmark</th>
+      <th>correct_forecasts_delta</th>
+      <th>incorrect_forecasts_focus</th>
+      <th>incorrect_forecasts_benchmark</th>
+      <th>incorrect_forecasts_delta</th>
+      <th>classification_accuracy_focus</th>
+      <th>classification_accuracy_benchmark</th>
+      <th>classification_accuracy_delta</th>
+      <th>classification_accuracy_pct_focus</th>
+      <th>classification_accuracy_pct_benchmark</th>
+      <th>classification_accuracy_pct_delta</th>
+      <th>threshold_focus</th>
+      <th>threshold_benchmark</th>
+      <th>threshold_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>14</td>
+      <td>15</td>
+      <td>-1</td>
+      <td>7</td>
+      <td>6</td>
+      <td>1</td>
+      <td>0.6667</td>
+      <td>0.7143</td>
+      <td>-0.0476</td>
+      <td>66.67</td>
+      <td>71.43</td>
+      <td>-4.76</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minute 30</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>12</td>
+      <td>11</td>
+      <td>1</td>
+      <td>6</td>
+      <td>7</td>
+      <td>-1</td>
+      <td>0.6667</td>
+      <td>0.6111</td>
+      <td>+0.0556</td>
+      <td>66.67</td>
+      <td>61.11</td>
+      <td>+5.56</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>177</td>
+      <td>177</td>
+      <td>0</td>
+      <td>124</td>
+      <td>132</td>
+      <td>-8</td>
+      <td>53</td>
+      <td>45</td>
+      <td>8</td>
+      <td>0.7006</td>
+      <td>0.7458</td>
+      <td>-0.0452</td>
+      <td>70.06</td>
+      <td>74.58</td>
+      <td>-4.52</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>165</td>
+      <td>165</td>
+      <td>0</td>
+      <td>126</td>
+      <td>118</td>
+      <td>8</td>
+      <td>39</td>
+      <td>47</td>
+      <td>-8</td>
+      <td>0.7636</td>
+      <td>0.7152</td>
+      <td>+0.0485</td>
+      <td>76.36</td>
+      <td>71.52</td>
+      <td>+4.85</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>135</td>
+      <td>135</td>
+      <td>0</td>
+      <td>103</td>
+      <td>95</td>
+      <td>8</td>
+      <td>32</td>
+      <td>40</td>
+      <td>-8</td>
+      <td>0.7630</td>
+      <td>0.7037</td>
+      <td>+0.0593</td>
+      <td>76.30</td>
+      <td>70.37</td>
+      <td>+5.93</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>171</td>
+      <td>171</td>
+      <td>0</td>
+      <td>145</td>
+      <td>132</td>
+      <td>13</td>
+      <td>26</td>
+      <td>39</td>
+      <td>-13</td>
+      <td>0.8480</td>
+      <td>0.7719</td>
+      <td>+0.0760</td>
+      <td>84.80</td>
+      <td>77.19</td>
+      <td>+7.60</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>150</td>
+      <td>150</td>
+      <td>0</td>
+      <td>130</td>
+      <td>129</td>
+      <td>1</td>
+      <td>20</td>
+      <td>21</td>
+      <td>-1</td>
+      <td>0.8667</td>
+      <td>0.8600</td>
+      <td>+0.0067</td>
+      <td>86.67</td>
+      <td>86.00</td>
+      <td>+0.67</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>147</td>
+      <td>147</td>
+      <td>0</td>
+      <td>132</td>
+      <td>137</td>
+      <td>-5</td>
+      <td>15</td>
+      <td>10</td>
+      <td>5</td>
+      <td>0.8980</td>
+      <td>0.9320</td>
+      <td>-0.0340</td>
+      <td>89.80</td>
+      <td>93.20</td>
+      <td>-3.40</td>
+      <td>0.5000</td>
+      <td>0.5000</td>
+      <td>+0.0000</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+    <section class="panel">
+      <h3>Brier Decomposition By Bucket</h3>
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>display_name</th>
+      <th>n_forecasts_focus</th>
+      <th>n_forecasts_benchmark</th>
+      <th>n_forecasts_delta</th>
+      <th>brier_score_focus</th>
+      <th>brier_score_benchmark</th>
+      <th>brier_score_delta</th>
+      <th>reliability_focus</th>
+      <th>reliability_benchmark</th>
+      <th>reliability_delta</th>
+      <th>resolution_focus</th>
+      <th>resolution_benchmark</th>
+      <th>resolution_delta</th>
+      <th>uncertainty_focus</th>
+      <th>uncertainty_benchmark</th>
+      <th>uncertainty_delta</th>
+      <th>brier_from_decomposition_focus</th>
+      <th>brier_from_decomposition_benchmark</th>
+      <th>brier_from_decomposition_delta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Minute 1</td>
+      <td>21</td>
+      <td>21</td>
+      <td>0</td>
+      <td>0.2422</td>
+      <td>0.1617</td>
+      <td>+0.0805</td>
+      <td>0.1180</td>
+      <td>0.0754</td>
+      <td>+0.0426</td>
+      <td>0.0562</td>
+      <td>0.0941</td>
+      <td>-0.0379</td>
+      <td>0.1814</td>
+      <td>0.1814</td>
+      <td>+0.0000</td>
+      <td>0.2432</td>
+      <td>0.1627</td>
+      <td>+0.0805</td>
+    </tr>
+    <tr>
+      <td>Minute 30</td>
+      <td>18</td>
+      <td>18</td>
+      <td>0</td>
+      <td>0.2317</td>
+      <td>0.2208</td>
+      <td>+0.0110</td>
+      <td>0.0912</td>
+      <td>0.1132</td>
+      <td>-0.0220</td>
+      <td>0.0806</td>
+      <td>0.1204</td>
+      <td>-0.0398</td>
+      <td>0.2222</td>
+      <td>0.2222</td>
+      <td>+0.0000</td>
+      <td>0.2329</td>
+      <td>0.2150</td>
+      <td>+0.0179</td>
+    </tr>
+    <tr>
+      <td>Minutes 1-10</td>
+      <td>177</td>
+      <td>177</td>
+      <td>0</td>
+      <td>0.2154</td>
+      <td>0.1739</td>
+      <td>+0.0415</td>
+      <td>0.0502</td>
+      <td>0.0057</td>
+      <td>+0.0445</td>
+      <td>0.0762</td>
+      <td>0.0716</td>
+      <td>+0.0047</td>
+      <td>0.2450</td>
+      <td>0.2450</td>
+      <td>+0.0000</td>
+      <td>0.2190</td>
+      <td>0.1791</td>
+      <td>+0.0399</td>
+    </tr>
+    <tr>
+      <td>Minutes 11-20</td>
+      <td>165</td>
+      <td>165</td>
+      <td>0</td>
+      <td>0.1928</td>
+      <td>0.1769</td>
+      <td>+0.0159</td>
+      <td>0.0292</td>
+      <td>0.0301</td>
+      <td>-0.0009</td>
+      <td>0.0786</td>
+      <td>0.1005</td>
+      <td>-0.0219</td>
+      <td>0.2467</td>
+      <td>0.2467</td>
+      <td>+0.0000</td>
+      <td>0.1972</td>
+      <td>0.1763</td>
+      <td>+0.0210</td>
+    </tr>
+    <tr>
+      <td>Minutes 21-30</td>
+      <td>135</td>
+      <td>135</td>
+      <td>0</td>
+      <td>0.1920</td>
+      <td>0.1837</td>
+      <td>+0.0083</td>
+      <td>0.0243</td>
+      <td>0.0168</td>
+      <td>+0.0075</td>
+      <td>0.0798</td>
+      <td>0.0799</td>
+      <td>-0.0000</td>
+      <td>0.2469</td>
+      <td>0.2469</td>
+      <td>+0.0000</td>
+      <td>0.1914</td>
+      <td>0.1838</td>
+      <td>+0.0076</td>
+    </tr>
+    <tr>
+      <td>Minutes 31-40</td>
+      <td>171</td>
+      <td>171</td>
+      <td>0</td>
+      <td>0.1468</td>
+      <td>0.1273</td>
+      <td>+0.0196</td>
+      <td>0.0398</td>
+      <td>0.0248</td>
+      <td>+0.0150</td>
+      <td>0.1403</td>
+      <td>0.1453</td>
+      <td>-0.0050</td>
+      <td>0.2481</td>
+      <td>0.2481</td>
+      <td>+0.0000</td>
+      <td>0.1476</td>
+      <td>0.1276</td>
+      <td>+0.0200</td>
+    </tr>
+    <tr>
+      <td>Minutes 41-50</td>
+      <td>150</td>
+      <td>150</td>
+      <td>0</td>
+      <td>0.1240</td>
+      <td>0.0945</td>
+      <td>+0.0294</td>
+      <td>0.0285</td>
+      <td>0.0132</td>
+      <td>+0.0153</td>
+      <td>0.1535</td>
+      <td>0.1671</td>
+      <td>-0.0136</td>
+      <td>0.2493</td>
+      <td>0.2493</td>
+      <td>+0.0000</td>
+      <td>0.1243</td>
+      <td>0.0954</td>
+      <td>+0.0289</td>
+    </tr>
+    <tr>
+      <td>Minutes 51-60</td>
+      <td>147</td>
+      <td>147</td>
+      <td>0</td>
+      <td>0.0797</td>
+      <td>0.0473</td>
+      <td>+0.0324</td>
+      <td>0.0200</td>
+      <td>0.0078</td>
+      <td>+0.0122</td>
+      <td>0.1882</td>
+      <td>0.2111</td>
+      <td>-0.0229</td>
+      <td>0.2500</td>
+      <td>0.2500</td>
+      <td>+0.0000</td>
+      <td>0.0818</td>
+      <td>0.0467</td>
+      <td>+0.0351</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+  </section>
+
+  <h2>Resolution Audit Mismatches</h2>
+  <section class="section-stack">
+    <section class="panel">
+      <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>scope</th>
+      <th>audit_mismatches</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Model M RT: Low Volatility</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>Model K RT: Low Volatility</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table></div>
+      <p class="chart-note">
+        These audit mismatches are diagnostic only. They compare official Kalshi settlement results
+        against the Binance strike audit already used by the existing scripts and are not scored as truth.
+      </p>
+    </section>
+    <section class="panel">
+      <div class='table-grid'><section><h3>Model M RT: Low Volatility</h3><div class='table-wrap'><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>event_ticker</th>
+      <th>event_datetime_utc</th>
+      <th>contract_label</th>
+      <th>market_ticker</th>
+      <th>strike</th>
+      <th>official_result</th>
+      <th>outcome</th>
+      <th>binance_audit_price</th>
+      <th>binance_audit_outcome</th>
+      <th>source_file</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>KXBTCD-26APR1100</td>
+      <td>2026-04-11 04:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1100-T72899.99</td>
+      <td>72,899.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72,866.6300</td>
+      <td>0</td>
+      <td>20260411_0300UTC__KXBTCD-26APR1100.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1103</td>
+      <td>2026-04-11 07:00 UTC</td>
+      <td>OTM+1</td>
+      <td>KXBTCD-26APR1103-T72799.99</td>
+      <td>72,799.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72,762.0000</td>
+      <td>0</td>
+      <td>20260411_0600UTC__KXBTCD-26APR1103.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1105</td>
+      <td>2026-04-11 09:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1105-T72699.99</td>
+      <td>72,699.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72,664.1700</td>
+      <td>0</td>
+      <td>20260411_0800UTC__KXBTCD-26APR1105.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1204</td>
+      <td>2026-04-12 08:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1204-T71699.99</td>
+      <td>71,699.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71,665.0000</td>
+      <td>0</td>
+      <td>20260412_0700UTC__KXBTCD-26APR1204.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1208</td>
+      <td>2026-04-12 12:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1208-T71499.99</td>
+      <td>71,499.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71,468.5500</td>
+      <td>0</td>
+      <td>20260412_1100UTC__KXBTCD-26APR1208.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1216</td>
+      <td>2026-04-12 20:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1216-T71099.99</td>
+      <td>71,099.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71,084.1800</td>
+      <td>0</td>
+      <td>20260412_1900UTC__KXBTCD-26APR1216.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1606</td>
+      <td>2026-04-16 10:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1606-T74599.99</td>
+      <td>74,599.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>74,594.0200</td>
+      <td>0</td>
+      <td>20260416_0900UTC__KXBTCD-26APR1606.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1723</td>
+      <td>2026-04-18 03:00 UTC</td>
+      <td>OTM+1</td>
+      <td>KXBTCD-26APR1723-T77299.99</td>
+      <td>77,299.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>77,292.5200</td>
+      <td>0</td>
+      <td>20260418_0200UTC__KXBTCD-26APR1723.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1804</td>
+      <td>2026-04-18 08:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1804-T76999.99</td>
+      <td>76,999.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>76,997.8000</td>
+      <td>0</td>
+      <td>20260418_0700UTC__KXBTCD-26APR1804.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1820</td>
+      <td>2026-04-19 00:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1820-T75699.99</td>
+      <td>75,699.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>75,691.7600</td>
+      <td>0</td>
+      <td>20260418_2300UTC__KXBTCD-26APR1820.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR2201</td>
+      <td>2026-04-22 05:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR2201-T77499.99</td>
+      <td>77,499.9900</td>
+      <td>no</td>
+      <td>0</td>
+      <td>77,523.0000</td>
+      <td>1</td>
+      <td>20260422_0400UTC__KXBTCD-26APR2201.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR2318</td>
+      <td>2026-04-23 22:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR2318-T77899.99</td>
+      <td>77,899.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>77,864.8300</td>
+      <td>0</td>
+      <td>20260423_2100UTC__KXBTCD-26APR2318.csv</td>
+    </tr>
+  </tbody>
+</table></div></section><section><h3>Model K RT: Low Volatility</h3><div class='table-wrap'><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>event_ticker</th>
+      <th>event_datetime_utc</th>
+      <th>contract_label</th>
+      <th>market_ticker</th>
+      <th>strike</th>
+      <th>official_result</th>
+      <th>outcome</th>
+      <th>binance_audit_price</th>
+      <th>binance_audit_outcome</th>
+      <th>source_file</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>KXBTCD-26APR1100</td>
+      <td>2026-04-11 04:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1100-T72899.99</td>
+      <td>72,899.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72,866.6300</td>
+      <td>0</td>
+      <td>20260411_0300UTC__KXBTCD-26APR1100.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1103</td>
+      <td>2026-04-11 07:00 UTC</td>
+      <td>OTM+1</td>
+      <td>KXBTCD-26APR1103-T72799.99</td>
+      <td>72,799.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72,762.0000</td>
+      <td>0</td>
+      <td>20260411_0600UTC__KXBTCD-26APR1103.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1105</td>
+      <td>2026-04-11 09:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1105-T72699.99</td>
+      <td>72,699.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72,664.1700</td>
+      <td>0</td>
+      <td>20260411_0800UTC__KXBTCD-26APR1105.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1204</td>
+      <td>2026-04-12 08:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1204-T71699.99</td>
+      <td>71,699.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71,665.0000</td>
+      <td>0</td>
+      <td>20260412_0700UTC__KXBTCD-26APR1204.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1208</td>
+      <td>2026-04-12 12:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1208-T71499.99</td>
+      <td>71,499.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71,468.5500</td>
+      <td>0</td>
+      <td>20260412_1100UTC__KXBTCD-26APR1208.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1216</td>
+      <td>2026-04-12 20:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1216-T71099.99</td>
+      <td>71,099.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71,084.1800</td>
+      <td>0</td>
+      <td>20260412_1900UTC__KXBTCD-26APR1216.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1606</td>
+      <td>2026-04-16 10:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1606-T74599.99</td>
+      <td>74,599.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>74,594.0200</td>
+      <td>0</td>
+      <td>20260416_0900UTC__KXBTCD-26APR1606.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1723</td>
+      <td>2026-04-18 03:00 UTC</td>
+      <td>OTM+1</td>
+      <td>KXBTCD-26APR1723-T77299.99</td>
+      <td>77,299.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>77,292.5200</td>
+      <td>0</td>
+      <td>20260418_0200UTC__KXBTCD-26APR1723.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1804</td>
+      <td>2026-04-18 08:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1804-T76999.99</td>
+      <td>76,999.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>76,997.8000</td>
+      <td>0</td>
+      <td>20260418_0700UTC__KXBTCD-26APR1804.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1820</td>
+      <td>2026-04-19 00:00 UTC</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1820-T75699.99</td>
+      <td>75,699.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>75,691.7600</td>
+      <td>0</td>
+      <td>20260418_2300UTC__KXBTCD-26APR1820.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR2201</td>
+      <td>2026-04-22 05:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR2201-T77499.99</td>
+      <td>77,499.9900</td>
+      <td>no</td>
+      <td>0</td>
+      <td>77,523.0000</td>
+      <td>1</td>
+      <td>20260422_0400UTC__KXBTCD-26APR2201.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR2318</td>
+      <td>2026-04-23 22:00 UTC</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR2318-T77899.99</td>
+      <td>77,899.9900</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>77,864.8300</td>
+      <td>0</td>
+      <td>20260423_2100UTC__KXBTCD-26APR2318.csv</td>
+    </tr>
+  </tbody>
+</table></div></section></div>
+    </section>
+  </section>
+
+  <h2>Volatility Threshold Context</h2>
+  <section class="panel">
+    <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>threshold_name</th>
+      <th>percentile</th>
+      <th>window_hours</th>
+      <th>latest_realized_volatility_cutoff</th>
+      <th>median_realized_volatility_cutoff</th>
+      <th>min_realized_volatility_cutoff</th>
+      <th>max_realized_volatility_cutoff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Low Volatility Extreme</td>
+      <td>0.1000</td>
+      <td>72</td>
+      <td>0.0025</td>
+      <td>0.0024</td>
+      <td>0.0014</td>
+      <td>0.0029</td>
+    </tr>
+    <tr>
+      <td>Low Volatility</td>
+      <td>0.2500</td>
+      <td>72</td>
+      <td>0.0030</td>
+      <td>0.0029</td>
+      <td>0.0018</td>
+      <td>0.0033</td>
+    </tr>
+    <tr>
+      <td>High Volatility</td>
+      <td>0.7500</td>
+      <td>72</td>
+      <td>0.0049</td>
+      <td>0.0050</td>
+      <td>0.0036</td>
+      <td>0.0058</td>
+    </tr>
+    <tr>
+      <td>High Volatility Extreme</td>
+      <td>0.9000</td>
+      <td>72</td>
+      <td>0.0063</td>
+      <td>0.0066</td>
+      <td>0.0049</td>
+      <td>0.0076</td>
+    </tr>
+  </tbody>
+</table></div>
+    <p class="chart-note">
+      The real-time volatility segmentation uses a trailing <code>72</code>-hour
+      window, equivalent to <code>4320</code> Binance one-minute observations.
+    </p>
+  </section>
+
+  <h2>Assumptions</h2>
+  <section class="panel">
+    <ul><li>Model M forecast values are interpreted as YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.</li><li>Scored event outcome is the official Kalshi contract result: 1 for YES resolved, 0 for NO resolved.</li><li>Forecast rows are joined to outcomes by exact Kalshi market ticker when available; legacy price files without market tickers fall back to event_ticker + contract_label + strike.</li><li>Event tickers are interpreted as the contract settlement/end hour, matching the price fetcher&#x27;s hour_end_utc -&gt; New York event ticker convention.</li><li>Binance prices are diagnostic only. They may be used for strike matching upstream and audit mismatch checks, but never as the scored truth label.</li><li>Events present in the Kalshi price files but absent from the settlement CSV are excluded from scoring and counted in outcome_join_coverage.csv.</li><li>Model M probabilities include an isotonic regression layer fit only on high-volatility-extreme historical minutes outside the Kalshi settlement/pricing backtest range.</li><li>When present, Model M raw_probability diagnostics are the pre-isotonic Monte Carlo YES probabilities and calibrated_probability diagnostics are the post-isotonic probabilities used for scoring.</li><li>Kalshi prices are YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.</li><li>Volatility decomposition uses Binance BTCUSDT 1-minute candles aligned to each scored Kalshi forecast hour.</li><li>Hourly realized volatility is defined as sqrt(sum(log(close/open)^2)) across the 60 one-minute Binance bars inside the forecast hour.</li><li>Real-time classification uses the trailing 72-hour (4320-minute) Binance window available at each scored hour.</li><li>Rolling cutoff summaries in this run: q10 latest=0.00251833, median=0.00243236, range=[0.00136078, 0.00287415]; q25 latest=0.00302169, median=0.00286087, range=[0.00177498, 0.00325354]; q75 latest=0.00487723, median=0.00501546, range=[0.00363224, 0.00576850]; q90 latest=0.00632642, median=0.00655630, range=[0.00494499, 0.00758148].</li><li>Low Volatility includes hours with realized volatility &lt;= trailing q25; Standard Volatility includes trailing q25 &lt; realized volatility &lt; trailing q75; High Volatility includes realized volatility &gt;= trailing q75.</li></ul>
+  </section>
+
+  <h2>Run Notes</h2>
+  <section class="panel">
+    <ul><li>Loaded official Kalshi contract outcomes from kalshi_btc_atm_settlements.csv.</li><li>Reused hourly volatility segment table from /Users/socks/Repositories/Volatility-Specific-Probabilistic-Classification-BTC-Model/Model_M_Volatility_Decomposition_RT/Model_M_Volatility_Decomposition_RT_outputs/p_gt_0_15/hourly_market_volatility_segments.csv.</li><li>Volatility bins use the same trailing 72-hour real-time realized-volatility definition as the existing Model_K volatility scripts.</li><li>Dashboard charts and tables are rendered in dark mode and keep the same overall layout as Model_K_Volatility_Results_Dashboard.</li><li>Cross-model scoring metrics in this family are computed only on the exact overlapping scored rows keyed by event_contract_id + forecast_datetime_utc.</li></ul>
+    <p class="chart-note"><a href="../index.html">Back to dashboard index</a></p>
+  </section>
+</main>
+</body>
+</html>

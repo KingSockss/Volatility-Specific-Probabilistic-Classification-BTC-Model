@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model M RT: Low Volatility With Coverage</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071018;
+      --panel: #0d1722;
+      --panel-2: #122130;
+      --ink: #e6eef8;
+      --muted: #9db0c3;
+      --line: #223548;
+      --soft: #102030;
+      --blue: #6cb6ff;
+      --teal: #4fd1c5;
+      --amber: #f6ad55;
+      --link: #8cc8ff;
+    }
+    html {
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top, rgba(76, 132, 196, 0.18), transparent 32%),
+        linear-gradient(180deg, #08111a 0%, #071018 100%);
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    h2 {
+      margin: 34px 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    p, li {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    a {
+      color: var(--link);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .metric-card strong {
+      display: block;
+      font-size: 24px;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .chart {
+      width: 100%;
+      min-height: 280px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+    }
+    .chart-title {
+      font-size: 16px;
+      font-weight: 650;
+      fill: var(--ink);
+    }
+    .axis {
+      stroke: #35516c;
+      stroke-width: 1;
+    }
+    .diag {
+      fill: none;
+      stroke: #6682a0;
+      stroke-width: 1.5;
+      stroke-dasharray: 5 5;
+    }
+    .series {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 3;
+    }
+    circle {
+      fill: var(--blue);
+    }
+    rect {
+      fill: var(--teal);
+    }
+    .axis-label, .tick {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .data-table th, .data-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+    }
+    .data-table td {
+      color: var(--ink);
+    }
+    .data-table th {
+      background: var(--panel-2);
+      color: var(--ink);
+      font-weight: 650;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    code {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 2px 5px;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Model M RT: Low Volatility With Coverage</h1>
+  <p>
+    Forecasts are minute-level Model M YES probabilities from the hourly forecast files. Reality is the
+    official Kalshi contract result for the exact matched market, encoded as <code>1</code> for
+    YES resolved and <code>0</code> for NO resolved.
+  </p>
+  <h2>Assumptions</h2>
+  <ul><li>Model M forecast values are interpreted as YES probabilities. CSV values greater than 1 and no greater than 100 are treated as cents and divided by 100 before scoring.</li><li>Scored event outcome is the official Kalshi contract result: 1 for YES resolved, 0 for NO resolved.</li><li>Forecast rows are joined to outcomes by exact Kalshi market ticker when available; legacy price files without market tickers fall back to event_ticker + contract_label + strike.</li><li>Event tickers are interpreted as the contract settlement/end hour, matching the price fetcher&#x27;s hour_end_utc -&gt; New York event ticker convention.</li><li>Binance prices are diagnostic only. They may be used for strike matching upstream and audit mismatch checks, but never as the scored truth label.</li><li>Events present in the Kalshi price files but absent from the settlement CSV are excluded from scoring and counted in outcome_join_coverage.csv.</li><li>Model M probabilities include an isotonic regression layer fit only on high-volatility-extreme historical minutes outside the Kalshi settlement/pricing backtest range.</li><li>When present, Model M raw_probability diagnostics are the pre-isotonic Monte Carlo YES probabilities and calibrated_probability diagnostics are the post-isotonic probabilities used for scoring.</li></ul>
+  <div class="cards"><section class='metric-card'><span>Scored rows</span><strong>213</strong></section>
+<section class='metric-card'><span>Event contracts</span><strong>93</strong></section>
+<section class='metric-card'><span>Brier score</span><strong>0.1564</strong></section>
+<section class='metric-card'><span>Log loss</span><strong>0.4768</strong></section>
+<section class='metric-card'><span>ECE</span><strong>0.1564</strong></section>
+<section class='metric-card'><span>Audit mismatches</span><strong>8</strong></section></div>
+  <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="93097ebc-d393-49f5-8e78-5a4a9abccda1" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("93097ebc-d393-49f5-8e78-5a4a9abccda1")) {                    Plotly.newPlot(                        "93097ebc-d393-49f5-8e78-5a4a9abccda1",                        [{"line":{"color":"#9ca3af","dash":"dash"},"mode":"lines","name":"Perfect calibration","x":[0,1],"y":[0,1],"type":"scatter","xaxis":"x","yaxis":"y"},{"line":{"color":"#2563eb"},"mode":"lines+markers","name":"Observed","x":{"dtype":"f8","bdata":"nq+3hhJfpD+3o5fGc8\u002fCP+sz9PE\u002fW9A\u002fsxLC4gCk1j81i7LgL3\u002fcP3exSJbANOE\u002fASNtbYHW5D9J8T1xj6DnP37EEyOFqeo\u002fMipkgNM+7z8="},"y":{"dtype":"f8","bdata":"AAAAAAAAAAAAAAAAAAAAAGgvob2E9sI\u002fewntJbSX0D8ZnI\u002fB+RjcPzw8PDw8POw\u002fzczMzMzM7D8AAAAAAADwPwAAAAAAAPA\u002fAAAAAAAA8D8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"marker":{"color":"#0f766e"},"name":"Forecasts","nbinsx":20,"x":{"dtype":"f8","bdata":"NM4tCxWl2T9+9S\u002fbC8nPPzfzSB6IvNw\u002fmd11KRa2yj9ZeeLsTvq7PzLwV\u002f83S+A\u002fxLSsy7U22D8vm51noF7NPyo66fDsndw\u002f\u002fImObOsztD84wE\u002f\u002fm1GhP52qzegoj8A\u002frBbhLit3xz8iO2geJp65P1F9hJoSKNg\u002fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVtEfC3mo4D8WvVYGeD\u002fRPy3tz2XkAOg\u002fG4SoL+9K4j+fhZWk0kfQP72Y40VhVes\u002fC7JyO2pK3j+gnFvFpEXUP5ZS2BSLteA\u002f9aa4DMXdwD9WnorvETKkP4yLkea4E+I\u002fELs\u002ffhyQ4D+1uxuBZl7bPy0fXmGq6uE\u002ffTL8bsi\u002f4T9+AXlJPwbaP+GFyC26s+g\u002fBotA9IiA3T9InPPy+bjSP8ouwyQY3eA\u002fiYZUCFRL3T9\u002fnaszL1XSPymROdsV5uA\u002fFPGfEb6ctT9vspNsoSiIP1haQOfvtdU\u002f3sh3TwSS4D850A1WHbzdPwZX\u002fwSR2uQ\u002fjWmVlpeR4T8E7OXOQ7jdP1gWm+4+B+c\u002fCKRKlI+j4D\u002feMOClgyjTP3U4Smwhtec\u002fOlgdJjXh1T\u002fL4T9qWNK2PyP9syH9s+k\u002fTPozcc1t4D\u002faFqdubNTYP1myVvOiheI\u002f4jmNB3Zd4D\u002fGuvb+pzvYP3mVeMa4a+I\u002fblRr\u002fzaS4D+Msa9bD4bZP\u002fvwJUDn\u002f+I\u002fOOecc8453z9Nw59NWpvFP64IedSu+eg\u002fchzHcRzH4T+s+uBGMLHBP9M5PDbFX+0\u002f+LCSkFYY4T9Qiq8emM3UPyxYgPRN4OY\u002fYFd5BSAi4D9hGWNSf3fSPwq2S9o\u002f4uY\u002fnZ5nEeeO4j9xjr3Ja73UPwlDZ6x5sug\u002fkxwn3x7p3D+3evdPbDnUP4RIW7aiqOA\u002fW5D1Sc153D9E2N+zFfHTPxOO7Pcmz+A\u002fcYMmtmVa2z99Ywjv0D\u002fTPyy2EyuBt+A\u002fDrv60cWnxD8dBqMxWcOiP5tVyQVD9uA\u002f1WcwbnUh3D\u002f97Pu1lA3UP6AlwbKmH+I\u002fWFGLqJks2z93qTffJlXRP2MiPKU6MeI\u002fQjg42V4n3D\u002fM0tsKquLWP+u+C9vGGOE\u002f8jdXrQBn2j9EeOoiHW\u002fPP4TnIbtshOA\u002fx+rjdYdG2z+XBXv1K8DQP341UdqrI+E\u002fXVIJItER3j9CMg1jOWvSP7aipnyo8eY\u002fPR64m35g3D\u002fP0fgu4ZPMPwJesxQdceU\u002fAAAAAAAA4D\u002fMXG7o9oLSP\u002f1HD3Wt4OY\u002fvm6A+IGI5D\u002fFw9QBcLzeP\u002f+BH5+0luc\u002fSjYD\u002f3T06j99Ux3+H2LlP12QgU0oT+8\u002fJgI1r8670D8hqFAA0wvKP0hMYvvQBdo\u002f7rtxo3FO7j+XQ1hooiDnPwAAAAAAAPA\u002fAAAAAAAA8D+6G2KqLY7tPwAAAAAAAPA\u002fnn6jsp992T8XbS0j5lDNP03DjENKHeE\u002fjF7dFlQe2z+aHP11bDjSP4NvydvPSuE\u002fAl3qXPx22j\u002fkXVw+pL7NP6s\u002fBA3PdOE\u002fqpLV7LuC2z+pBO3En63NP+LReezovuI\u002fdlGRDFJY2T\u002fHk1Uhs7TKP\u002fvD4QIWkOE\u002fmyAsuWpl2T8YGUy1x3rJPxWbUNwuTeM\u002fzKUZZbx\u002f1D9HiMORCALHP090u5GHceE\u002fAlCuVF94wz\u002fVNIKYBleiPwFHdBgMuNQ\u002f3PjHjFnatT\u002f4coWxB2KWPxOLe0FCnM8\u002fagCvD4A73j\u002fMepQP4OvZP8vcw\u002fPjQeE\u002fBe5yItoq3T+SDSBgZs7XP+6Nxux1T+A\u002fwoTFrnXY1D+SBJzlvYrOP17X5oV3p9k\u002fKgxETCDl5D\u002f408Hem\u002f\u002fcP3OQaNzqheg\u002f0ELEJMIr4j9wk0eEzVjWP1V9kJkkCOg\u002fBE9BCpEq3T8hh+hA4e\u002fXPzvGD8caU+A\u002fEtxJAwMg4T8vVU1HTHzcPxyPnrxscOU\u002f7ocf+j+j4z+pXJ1LHDLgP21JUPX1cOY\u002fG35O5CQp3j\u002fLxJVgyzPAP81FtCVBqOo\u002feNt8Ol+X3j8SzVe3p9jYP7DaJ4Qaj+E\u002f3o1MlnTU2z8fBRE9lH7WP6bnwrLaR+A\u002f7hobXuu+4D\u002filjQOPHfbPwgcncBIv+Q\u002frWvuOBK54T9L3AZnRMPdP3UMA5Z5JeY\u002fAAAAAAAA8D8dBFgytujvPwAAAAAAAPA\u002fP2SSWjyZ3T\u002fZCK6N4NrYP5rjvtKwvOA\u002faE6R2W4+0T+Wg6mGiJ7CP4SgL7w+AN0\u002fGbrF5S9E0j\u002fMxYxc6w7EP1w925Ro3OA\u002f6aONHzIt0D9RuaBla1m\u002fP6l1v8A4t+A\u002f"},"type":"histogram","xaxis":"x2","yaxis":"y2"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,0.44],"title":{"text":"Mean Model M probability"},"range":[0,1]},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Observed frequency"},"range":[0,1]},"xaxis2":{"anchor":"y2","domain":[0.56,1.0],"title":{"text":"Model M probability"},"range":[0,1]},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"title":{"text":"Count"}},"annotations":[{"font":{"size":16},"showarrow":false,"text":"Calibration","x":0.22,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"Model M Probability Distribution","x":0.78,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"}],"margin":{"l":40,"r":30,"t":70,"b":40},"height":420,"showlegend":false},                        {"responsive": true}                    )                };            </script>        </div>
+  <p class="note">Plotly was available, so charts are interactive.</p>
+
+  <h2>Metric Summary</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts</th>
+      <th>n_event_contracts</th>
+      <th>base_rate</th>
+      <th>mean_p_kalshi</th>
+      <th>brier_score</th>
+      <th>log_loss</th>
+      <th>classification_accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overall</td>
+      <td>213</td>
+      <td>93</td>
+      <td>0.525822</td>
+      <td>0.448523</td>
+      <td>0.156443</td>
+      <td>0.476761</td>
+      <td>0.835681</td>
+    </tr>
+    <tr>
+      <td>ATM</td>
+      <td>71</td>
+      <td>31</td>
+      <td>0.563380</td>
+      <td>0.446707</td>
+      <td>0.185938</td>
+      <td>0.542689</td>
+      <td>0.774648</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>71</td>
+      <td>31</td>
+      <td>0.183099</td>
+      <td>0.300044</td>
+      <td>0.121030</td>
+      <td>0.393666</td>
+      <td>0.859155</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>71</td>
+      <td>31</td>
+      <td>0.830986</td>
+      <td>0.598819</td>
+      <td>0.162359</td>
+      <td>0.493929</td>
+      <td>0.873239</td>
+    </tr>
+  </tbody>
+</table></div>
+  
+  <h2>Outcome Join Coverage</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>scope</th>
+      <th>value</th>
+      <th>total_forecast_rows</th>
+      <th>matched_rows</th>
+      <th>unmatched_rows</th>
+      <th>match_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overall</td>
+      <td>all</td>
+      <td>213</td>
+      <td>213</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>ATM</td>
+      <td>71</td>
+      <td>71</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>OTM+1</td>
+      <td>71</td>
+      <td>71</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>contract_label</td>
+      <td>OTM-1</td>
+      <td>71</td>
+      <td>71</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_0300UTC__KXBTCD-26APR0900.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260409_1100UTC__KXBTCD-26APR0908.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_0200UTC__KXBTCD-26APR0923.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_0700UTC__KXBTCD-26APR1004.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_1000UTC__KXBTCD-26APR1007.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260410_2200UTC__KXBTCD-26APR1019.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0300UTC__KXBTCD-26APR1100.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0600UTC__KXBTCD-26APR1103.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0700UTC__KXBTCD-26APR1104.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_0800UTC__KXBTCD-26APR1105.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_1200UTC__KXBTCD-26APR1109.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260411_1400UTC__KXBTCD-26APR1111.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0700UTC__KXBTCD-26APR1204.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0800UTC__KXBTCD-26APR1205.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_0900UTC__KXBTCD-26APR1206.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_1100UTC__KXBTCD-26APR1208.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260412_1900UTC__KXBTCD-26APR1216.csv</td>
+      <td>6</td>
+      <td>6</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260413_1100UTC__KXBTCD-26APR1308.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260416_0900UTC__KXBTCD-26APR1606.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260416_1100UTC__KXBTCD-26APR1608.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0500UTC__KXBTCD-26APR1702.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_0700UTC__KXBTCD-26APR1704.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260417_1100UTC__KXBTCD-26APR1708.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0600UTC__KXBTCD-26APR1803.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260418_0700UTC__KXBTCD-26APR1804.csv</td>
+      <td>24</td>
+      <td>24</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0700UTC__KXBTCD-26APR2204.csv</td>
+      <td>15</td>
+      <td>15</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_0900UTC__KXBTCD-26APR2206.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_1000UTC__KXBTCD-26APR2207.csv</td>
+      <td>12</td>
+      <td>12</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_2100UTC__KXBTCD-26APR2218.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260422_2200UTC__KXBTCD-26APR2219.csv</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>source_file</td>
+      <td>20260424_0700UTC__KXBTCD-26APR2404.csv</td>
+      <td>9</td>
+      <td>9</td>
+      <td>0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table></div>
+
+
+  <h2>Brier Decomposition</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts</th>
+      <th>brier_score</th>
+      <th>reliability</th>
+      <th>resolution</th>
+      <th>uncertainty</th>
+      <th>brier_from_decomposition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overall</td>
+      <td>213</td>
+      <td>0.156443</td>
+      <td>0.040939</td>
+      <td>0.132506</td>
+      <td>0.249333</td>
+      <td>0.157767</td>
+    </tr>
+    <tr>
+      <td>ATM</td>
+      <td>71</td>
+      <td>0.185938</td>
+      <td>0.062563</td>
+      <td>0.120899</td>
+      <td>0.245983</td>
+      <td>0.187647</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>71</td>
+      <td>0.121030</td>
+      <td>0.026369</td>
+      <td>0.054698</td>
+      <td>0.149573</td>
+      <td>0.121244</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>71</td>
+      <td>0.162359</td>
+      <td>0.082642</td>
+      <td>0.060372</td>
+      <td>0.140448</td>
+      <td>0.162718</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Expanded Calibration Error</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts</th>
+      <th>expected_calibration_error</th>
+      <th>root_mean_squared_calibration_error</th>
+      <th>max_calibration_error</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overall</td>
+      <td>213</td>
+      <td>0.156446</td>
+      <td>0.202335</td>
+      <td>0.344663</td>
+    </tr>
+    <tr>
+      <td>ATM</td>
+      <td>71</td>
+      <td>0.177378</td>
+      <td>0.250126</td>
+      <td>0.464002</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>71</td>
+      <td>0.136333</td>
+      <td>0.162385</td>
+      <td>0.506117</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>71</td>
+      <td>0.268395</td>
+      <td>0.287474</td>
+      <td>0.753044</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Sharpness</h2>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>segment</th>
+      <th>n_forecasts</th>
+      <th>base_rate</th>
+      <th>mean_p_kalshi</th>
+      <th>forecast_std</th>
+      <th>sharpness_variance_from_base_rate</th>
+      <th>mean_abs_distance_from_0_5</th>
+      <th>mean_predictive_variance_p_times_1_minus_p</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overall</td>
+      <td>213</td>
+      <td>0.525822</td>
+      <td>0.448523</td>
+      <td>0.220894</td>
+      <td>0.054769</td>
+      <td>0.174540</td>
+      <td>0.198556</td>
+    </tr>
+    <tr>
+      <td>ATM</td>
+      <td>71</td>
+      <td>0.563380</td>
+      <td>0.446707</td>
+      <td>0.186478</td>
+      <td>0.048387</td>
+      <td>0.133453</td>
+      <td>0.212386</td>
+    </tr>
+    <tr>
+      <td>OTM+1</td>
+      <td>71</td>
+      <td>0.183099</td>
+      <td>0.300044</td>
+      <td>0.183368</td>
+      <td>0.047300</td>
+      <td>0.237078</td>
+      <td>0.176394</td>
+    </tr>
+    <tr>
+      <td>OTM-1</td>
+      <td>71</td>
+      <td>0.830986</td>
+      <td>0.598819</td>
+      <td>0.182611</td>
+      <td>0.087248</td>
+      <td>0.153087</td>
+      <td>0.206888</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Resolution Audit Mismatches</h2>
+  <p class="note">
+    Binance audit checks are diagnostic only and are not used as the scored truth label.
+  </p>
+  <div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: left;">
+      <th>event_ticker</th>
+      <th>event_datetime_utc</th>
+      <th>contract_label</th>
+      <th>market_ticker</th>
+      <th>strike</th>
+      <th>official_result</th>
+      <th>outcome</th>
+      <th>binance_audit_price</th>
+      <th>binance_audit_outcome</th>
+      <th>source_file</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>KXBTCD-26APR1100</td>
+      <td>2026-04-11 04:00:00+00:00</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1100-T72899.99</td>
+      <td>72899.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72866.63</td>
+      <td>0</td>
+      <td>20260411_0300UTC__KXBTCD-26APR1100.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1103</td>
+      <td>2026-04-11 07:00:00+00:00</td>
+      <td>OTM+1</td>
+      <td>KXBTCD-26APR1103-T72799.99</td>
+      <td>72799.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72762.00</td>
+      <td>0</td>
+      <td>20260411_0600UTC__KXBTCD-26APR1103.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1105</td>
+      <td>2026-04-11 09:00:00+00:00</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1105-T72699.99</td>
+      <td>72699.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>72664.17</td>
+      <td>0</td>
+      <td>20260411_0800UTC__KXBTCD-26APR1105.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1204</td>
+      <td>2026-04-12 08:00:00+00:00</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1204-T71699.99</td>
+      <td>71699.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71665.00</td>
+      <td>0</td>
+      <td>20260412_0700UTC__KXBTCD-26APR1204.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1208</td>
+      <td>2026-04-12 12:00:00+00:00</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1208-T71499.99</td>
+      <td>71499.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71468.55</td>
+      <td>0</td>
+      <td>20260412_1100UTC__KXBTCD-26APR1208.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1216</td>
+      <td>2026-04-12 20:00:00+00:00</td>
+      <td>ATM</td>
+      <td>KXBTCD-26APR1216-T71099.99</td>
+      <td>71099.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>71084.18</td>
+      <td>0</td>
+      <td>20260412_1900UTC__KXBTCD-26APR1216.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1606</td>
+      <td>2026-04-16 10:00:00+00:00</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1606-T74599.99</td>
+      <td>74599.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>74594.02</td>
+      <td>0</td>
+      <td>20260416_0900UTC__KXBTCD-26APR1606.csv</td>
+    </tr>
+    <tr>
+      <td>KXBTCD-26APR1804</td>
+      <td>2026-04-18 08:00:00+00:00</td>
+      <td>OTM-1</td>
+      <td>KXBTCD-26APR1804-T76999.99</td>
+      <td>76999.99</td>
+      <td>yes</td>
+      <td>1</td>
+      <td>76997.80</td>
+      <td>0</td>
+      <td>20260418_0700UTC__KXBTCD-26APR1804.csv</td>
+    </tr>
+  </tbody>
+</table></div>
+
+  <h2>Output Files</h2>
+  <p class="note">
+    Individual CSV outputs are saved next to this report in <code>Low Volatility</code>:
+    raw values, Brier score, Brier decomposition, log loss, calibration curve,
+    expanded calibration error, sharpness, isotonic forecast diagnostics, outcome join coverage,
+    unmatched rows, and audit mismatches.
+  </p>
+  <ul><li>Loaded official Kalshi contract outcomes from kalshi_btc_atm_settlements.csv.</li><li>Matched 213 of 213 forecast rows to official Kalshi outcomes inside the Low Volatility segment.</li><li>Low Volatility contains 31 of 109 scored hourly Kalshi markets. Hourly realized volatility at or below the trailing 72-hour rolling 25th percentile.</li><li>Hourly realized volatility is computed from Binance BTCUSDT 1-minute candles as sqrt(sum(log(close/open)^2)) over the 60 one-minute bars in each forecast hour.</li><li>Each scored hour is classified against a trailing 72-hour (4320-minute) rolling window using only historical Binance volatility available at that hour.</li><li>Rolling cutoff summaries for this run: q10 latest=0.00251833, median=0.00243236, range=[0.00151318, 0.00287415]; q25 latest=0.00302169, median=0.00291996, range=[0.00204285, 0.00325354]; q75 latest=0.00506424, median=0.00506424, range=[0.00365014, 0.00557650]; q90 latest=0.00632642, median=0.00649155, range=[0.00513570, 0.00758148].</li><li>Found 8 Binance audit mismatch row(s); see resolution_mismatches.csv.</li></ul>
+</main>
+</body>
+</html>
